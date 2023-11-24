@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Registration Form{% endblock %}
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
         <h1>Costumer Registration</h1>
         <form action = "#" method = "POST">
             <label for = "firstname">First Name: </label>
