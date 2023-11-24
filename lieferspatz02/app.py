@@ -32,6 +32,7 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
 
+        #change connection to the path you saved Lieferspatz.db
         connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
         registerManager = registrationManager(connection)
         if registerManager.userNameExists(username):
@@ -59,6 +60,7 @@ def registration_success():
 
 @app.route("/login_customer", methods = ["POST","GET"])
 def login():
+    #change connection to the path you saved Lieferspatz.db
     connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
     loginManager = customerLogin(connection)
     if request.method == "POST":
