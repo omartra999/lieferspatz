@@ -31,6 +31,7 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
 
+        #for connection to work change the path to the path where you saved Lieferspatz database on your pc
         connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
         registerManager = registrationManager(connection)
         if registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
