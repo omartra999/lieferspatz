@@ -54,4 +54,4 @@ def registration_error():
      
 if __name__ == "__main__":
     app.run(debug=True)
-    print(currentDirectory)
+ 
