@@ -1,0 +1,17 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+    <body>
+        <!--top navigation bar-->
+        <div class="topnav">
+            <h1>Lieferspatz</h1>
+            <a href="/Home">Home</a>
+            <a href="/Buisness">Buisness</a>
+        </div>
+        {% block content %}
+        {% endblock %}
+        
+    </body>
+</html>
