@@ -1,5 +1,6 @@
-from flask import Flask, redirect, url_for, render_template, request,session
+from flask import Flask, redirect, url_for, render_template, request,session, flash
 from RegistrationManager import registrationManager
+from CustomerLogin import customerLogin
 import sqlite3
 import os
 
@@ -31,13 +32,17 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
 
-        #for connection to work change the path to the path where you saved Lieferspatz database on your pc
         connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
         registerManager = registrationManager(connection)
-        if registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
+        if registerManager.userNameExists(username):
+            flash("username exists in database")
+            return render_template("registration_form.html") 
+        elif password != confirmPassword:
+            flash("passwords do not match")
+            return render_template("registration_form.html")
+            
+        elif registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
             return redirect(url_for('registration_success'))
-        else:
-            return redirect(url_for("registration_error"))
     else:    
         return render_template("registration_form.html")
 
@@ -46,13 +51,35 @@ def register():
 def registration_success():
     if "username" in session:
         username = session["username"]
-        return f"<h1>{username} registered successfully</h1>"
+        flash(f"{username} registered successfully")
+        return redirect(url_for("login"))
     return redirect(url_for("register"))
 
-@app.route("/registration_error")
-def registration_error():
-    return f"<h1>Register failed<h1>"
-     
+
+
+@app.route("/login_customer", methods = ["POST","GET"])
+def login():
+    connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
+    loginManager = customerLogin(connection)
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        if loginManager.login(username, password):
+            session["username"] = username
+            flash("login successfuly")
+            return redirect(url_for("home"))
+        else:
+            flash("login failed check input")
+            return render_template("login_customer.html")
+    else:
+        return render_template("login_customer.html")
+@app.route("/home")
+def home():
+    if "username" in session:
+        return render_template("home.html")
+    else:
+        return redirect(url_for("login"))
 if __name__ == "__main__":
     app.run(debug=True)
- 
+    print(currentDirectory)
