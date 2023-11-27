@@ -1,6 +1,6 @@
 import sqlite3
 
-class customerLogin:
+class loginManager:
     def __init__(self,connection):
         self.connection =sqlite3.connect(connection)
         self.cursor = self.connection.cursor()
@@ -11,3 +11,4 @@ class customerLogin:
             result = self.cursor.execute(query,(username, password,)).fetchone()[0]
             if result > 0:
                 return True
+    ##add a restaurant log in function to also return boolean
