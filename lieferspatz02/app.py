@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request,session, flash
 from RegistrationManager import registrationManager
-from CustomerLogin import customerLogin
+from LoginManager import loginManager
 import sqlite3
 import os
 
@@ -13,9 +13,9 @@ def role():
     if request.method == "POST":
         selected_role = request.form['role']
         if selected_role == "customer":
-            return redirect(url_for("login"))
+            return redirect(url_for("register"))
         elif selected_role == "restaurant":
-            return redirect(url_for("login_restaurant"))
+            return redirect(url_for("register_restaurant"))
         else: 
             return "ERRORR"
     else:
@@ -44,21 +44,19 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
 
-        #change connection to the path you saved Lieferspatz.db
         connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
         registerManager = registrationManager(connection)
         if registerManager.userNameExists(username):
             flash("username exists in database")
-            return render_template("registration_form.html") 
+            return render_template(".html") 
         elif password != confirmPassword:
             flash("passwords do not match")
-            return render_template("registration_form.html")
-            
+            return render_template("customer_register.html")
+            customer_register
         elif registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
             return redirect(url_for('registration_success'))
     else:    
-        return render_template("registration_form.html")
-
+        return render_template("customer_register.html")
 
 @app.route("/registration_success")
 def registration_success():
@@ -68,32 +66,32 @@ def registration_success():
         return redirect(url_for("login"))
     return redirect(url_for("register"))
 
-
-
-@app.route("/login_customer", methods = ["POST","GET"])
+@app.route("/login", methods = ["POST","GET"])
 def login():
-    #change connection to the path you saved Lieferspatz.db
     connection ="D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
-    loginManager = customerLogin(connection)
+    login_manager = loginManager(connection)
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
-        if loginManager.login(username, password):
+        if login_manager.login(username, password):
             session["username"] = username
             flash("login successfuly")
             return redirect(url_for("home"))
+        ##add an elif to handle restaurant login
         else:
             flash("login failed check input")
-            return render_template("login_customer.html")
+            return render_template("login.html")
     else:
-        return render_template("login_customer.html")
+        return render_template("login.html")
+    
 @app.route("/home")
 def home():
     if "username" in session:
         return render_template("home.html")
     else:
         return redirect(url_for("login"))
+    
 if __name__ == "__main__":
     app.run(debug=True)
     print(currentDirectory)
