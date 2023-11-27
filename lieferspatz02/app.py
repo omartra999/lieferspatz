@@ -8,6 +8,18 @@ app = Flask(__name__)
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
 
+@app.route("/", methods = ["POST", "GET"])
+def role():
+    if request.method == "POST":
+        selected_role = request.form['role']
+        if selected_role == "customer":
+            return redirect(url_for("login"))
+        elif selected_role == "restaurant":
+            return redirect(url_for("login_restaurant"))
+        else: 
+            return "ERRORR"
+    else:
+       return render_template("index.html")
 
 @app.route("/register", methods = ["POST", "GET"])
 def register():
