@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Lieferspatz{% endblock %}
+{% block button %}<a href="/login" class="button-link">LOG IN</a>{% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -7,12 +8,11 @@
                 <p>{{msg}}</p>
             {% endfor %}
         {% endif %}
-    {% endwith %}
-    <h1>Lieferspatz</h1>
-    <form method="POST">
-        <input type="radio" name="role" id="customer" value="customer">I want to satisfy my stomach</input><br>
-        <input type="radio" name="role" id="restaurant" value="restaurant">I am a Business owner</input><br>   
-        <input type="submit" value="submit"> 
+{% endwith %}
+    <form method="POST" class="who-group">
+        <input type="radio" name="role" id="customer" value="customer">Register as a customer</input><br>
+        <input type="radio" name="role" id="restaurant" value="restaurant">Register as a restautrant owner</input><br>   
+        <input type="submit" value="SUBMIT" class="submit-button">     
     </form>
-    <a href = "/login">already have an account</a>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='who.css') }}">
 {% endblock %}    
