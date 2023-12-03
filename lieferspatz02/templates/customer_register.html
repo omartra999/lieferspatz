@@ -8,37 +8,45 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-        <h1>Costumer Registration</h1>
-        <form action = "#" method = "POST">
-            <label for = "firstname">First Name: </label>
-            <input type="text" id="firstname" name="firstname" required><br><br>
+        <div class="form-container">
+                   
+            <form action = "#" method = "POST" class="form-group">
+                <!--register from-->
+                <p class="join-us-text">JOIN US</p>
 
-            <label for = "lastname">Last Name: </label>
-            <input type="text" id="lastname" name="lastname" required><br><br>
+                <label for = "firstname">First Name: </label>
+                <input type="text" class="transparent-input" id="firstname" name="firstname" required><br><br>
 
-            <label for="username">Username: </label>
-            <input type="text" id="username" name="username" required><br><br>
+                <label for = "lastname">Last Name: </label>
+                <input type="text" class="transparent-input" id="lastname" name="lastname" required><br><br>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email"><br><br>
+                <label for = "street">Street:</label>
+                <input type="text" class="transparent-input" id="street" name="street" required><br><br>
 
-            <label for = "street">Street:</label>
-            <input type="text" id="street" name="street" required><br><br>
+                <label for="houseNr">House Number:</label>
+                <input type="number" class="transparent-input" id="houseNr" name="houseNr" required><br><br>
 
-            <label for="houseNr">House Number:</label>
-            <input type="number" id="houseNr" name="houseNr" required><br><br>
+                <label for="plz">Postal Code:</label>
+                <input type="number" class="transparent-input" id="plz" name="plz" required><br><br>
 
-            <label for="plz">Postal Code:</label>
-            <input type="number" id="plz" name="plz" required><br><br>
+                <label for="username">Username: </label>
+                <input type="text" class="transparent-input" id="username" name="username" required><br><br>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br><br>
+                <label for="email">Email:</label>
+                <input type="email" class="transparent-input" id="email" name="email"><br><br>
 
-            <label for="password_conformation">Confirm Password:</label>
-            <input type="password" id="password_conformation" name="password_conformation"><br><br>
+                <label for="password">Password:</label>
+                <input type="password" class="transparent-input" id="password" name="password" required><br><br>
 
-            <input type="submit" value="Register">
-        </form>
-        <a href = "/login">already have an account</a>
-        <a href = "/register_restaurant"> start a Buisness</a>
+                <label for="password_conformation">Confirm Password:</label>
+                <input type="password" class="transparent-input" id="password_conformation" name="password_conformation"><br><br>
+
+                <input type="submit" value="REGISTER" class="register-button">
+            </form>
+            
+            <img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="Customer Registration Image" class="registration-image">
+        </div>
+
+        
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='customer_register.css') }}">
     {% endblock %}

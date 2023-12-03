@@ -9,4 +9,21 @@
 {% endif %}
 {% endwith %}
 <h1> Placeholder for Restaurants </h1>
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant Overview</title>
+</head>
+<body>
+    <h1>Restaurant Selection</h1>
+    <ul>
+        {% for restaurant in restaurants %}
+            <li>
+                <h3>{{ restaurant[0] }}</h3>
+                <p>{{ restaurant[1] }} {{ restaurant[2]}}</p>
+                <a href="/restaurant/{{ restaurant[0] }}">View Details</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
 {% endblock %}
