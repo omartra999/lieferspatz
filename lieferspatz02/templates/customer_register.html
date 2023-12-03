@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Registration Form{% endblock %}
+{% block button %} <a href="/register_restaurant" class="button-link">BUSINESS</a>
+<a href="/login" class="button-link">LOG IN</a>
+{% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -8,13 +11,11 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    {% block button %} <a href="/register_restaurant" class="button-link">BUSINESS</a>
-    <a href="/login" class="button-link">LOG IN</a>  {% endblock %}
         <div class="form-container">
                    
             <form action = "#" method = "POST" class="form-group">
 
-                <p class="join-us-text">JOIN US</p>
+                <p class="box-name">JOIN US</p>
 
                 <label for = "firstname">First Name: </label>
                 <input type="text" class="transparent-input" id="firstname" name="firstname" required><br><br>
@@ -50,4 +51,4 @@
 
         
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='customer_register.css') }}">
-    {% endblock %}
+{% endblock %}
