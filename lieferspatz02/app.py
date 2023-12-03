@@ -8,7 +8,7 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspaz.db"
 registerManager = registrationManager(connection)
 login_manager = loginManager(connection)
 
@@ -176,8 +176,6 @@ def restaurant_login():
     ##role set
     role ="restaurant"
 
-    ##connecting database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     login_manager = loginManager(connection)
 
     ##login in
@@ -206,8 +204,6 @@ def home():
 
     if "username" in session: ## login success
 
-        ##connceting database
-        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
         conn = sqlite3.connect(connection)
         cursor = conn.cursor()
 
@@ -225,8 +221,6 @@ def home():
 @app.route('/restaurant/<string:restaurant_id>')
 def restaurant(restaurant_id):
 
-    ##connect database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     conn = sqlite3.connect(connection)
     cursor = conn.cursor()
 
