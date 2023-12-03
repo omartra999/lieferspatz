@@ -8,10 +8,12 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+    {% block button %} <a href="/register_restaurant" class="button-link">BUSINESS</a>
+    <a href="/login" class="button-link">LOG IN</a>  {% endblock %}
         <div class="form-container">
                    
             <form action = "#" method = "POST" class="form-group">
-                <!--register from-->
+
                 <p class="join-us-text">JOIN US</p>
 
                 <label for = "firstname">First Name: </label>
@@ -43,7 +45,6 @@
 
                 <input type="submit" value="REGISTER" class="register-button">
             </form>
-            
             <img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="Customer Registration Image" class="registration-image">
         </div>
 
