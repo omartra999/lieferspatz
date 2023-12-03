@@ -8,6 +8,9 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
+connection = "D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+registerManager = registrationManager(connection)
+login_manager = loginManager(connection)
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -58,10 +61,7 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
         session["usertype"] = "customer"
-    
-        ##connect to database
-        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-        registerManager = registrationManager(connection)
+
 
         ##checking unique username
         if registerManager.userNameExists(username):
@@ -111,10 +111,6 @@ def restaurant_register():
         session["confirmPassword"] = confirmPassword
         session["user_type"] = user_type
 
-        ##connect to database
-        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-        registerManager = registrationManager(connection)
-
         ##checking unique username
         if registerManager.userNameExists(username):
             flash("username exists in database")
@@ -154,9 +150,6 @@ def login():
     ##role set
     role="customer"
 
-    ##connecting database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-    login_manager = loginManager(connection)
 
     ##login in
     if request.method == "POST":
