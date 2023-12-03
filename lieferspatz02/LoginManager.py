@@ -12,3 +12,11 @@ class loginManager:
             if result > 0:
                 return True
     ##add a restaurant log in function to also return boolean
+   def loginRestaurant(self, username, password):
+        query = "SELECT COUNT(*) FROM RestaurantCredentials WHERE username = ? AND password = ?" ##given that the restaurants database is RestaurantCredentials (rename accordingly)
+        with self.connection:
+            result = self.cursor.execute(query,(username, password,)).fetchone()[0]
+            if result > 0:
+                return True
+            else:
+                return False 
