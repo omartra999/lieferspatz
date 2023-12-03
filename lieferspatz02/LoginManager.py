@@ -5,18 +5,14 @@ class loginManager:
         self.connection =sqlite3.connect(connection)
         self.cursor = self.connection.cursor()
 
-    def login(self, username, password):
-        query = "SELECT COUNT(*) FROM customer WHERE username = ? AND password = ?"
+    def login(self, username, password,role):
+        customer_query = "SELECT COUNT(*) FROM customer WHERE username = ? AND password = ?"
+        restaurant_query = "SELECT COUNT(*) FROM restaurant WHERE username = ? AND password = ?"
         with self.connection:
-            result = self.cursor.execute(query,(username, password,)).fetchone()[0]
+            if role == "customer":
+                result = self.cursor.execute(customer_query,(username, password,)).fetchone()[0]
+            if role == "restaurant":
+                result = self.cursor.execute(restaurant_query,(username, password,)).fetchone()[0]       
             if result > 0:
                 return True
     ##add a restaurant log in function to also return boolean
-   def loginRestaurant(self, username, password):
-        query = "SELECT COUNT(*) FROM RestaurantCredentials WHERE username = ? AND password = ?" ##given that the restaurants database is RestaurantCredentials (rename accordingly)
-        with self.connection:
-            result = self.cursor.execute(query,(username, password,)).fetchone()[0]
-            if result > 0:
-                return True
-            else:
-                return False 
