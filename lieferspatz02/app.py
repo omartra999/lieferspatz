@@ -8,9 +8,6 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspaz.db"
-registerManager = registrationManager(connection)
-login_manager = loginManager(connection)
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -20,7 +17,7 @@ def role():
 
         ##redirecting to according URL
         if selected_role == "customer":
-            return redirect(url_for("register"))
+            return redirect(url_for("customer_register"))
         
         elif selected_role == "restaurant":
             return redirect(url_for("restaurant_register"))
@@ -33,12 +30,10 @@ def role():
        return render_template("index.html")
     
 
-@app.route("/register", methods = ["POST", "GET"])
-def register():
+@app.route("/customer_register", methods = ["POST", "GET"])
+def customer_register():
 
     if request.method == "POST":
-        ## role set
-        user_type = "customer"
         ## request from html
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
@@ -60,8 +55,10 @@ def register():
         session["houseNr"] = houseNr
         session["password"] = password
         session["confirmPassword"] = confirmPassword
-        session["usertype"] = "customer"
-
+    
+        ##connect to database
+        connection = "C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
+        registerManager = registrationManager(connection)
 
         ##checking unique username
         if registerManager.userNameExists(username):
@@ -74,7 +71,7 @@ def register():
             return render_template("customer_register.html")
         
         ##registering
-        elif registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz,user_type):
+        elif registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
             return redirect(url_for('registration_success'))
     
     ##linking to "customer_register.html" 
@@ -84,32 +81,31 @@ def register():
 @app.route("/restaurant_register", methods = ["POST", "GET"])
 def restaurant_register():
     if request.method == "POST":
-
-        ## role set
-        user_type ="restaurant"
-
+            
         ## request from html
-        firstname = request.form["firstname"]
-        lastname = request.form["lastname"]
-        username = request.form["username"]
         email = request.form["email"]
-        street = request.form["street"]
-        houseNr = request.form["houseNr"]
-        plz = request.form["plz"]
+        username = request.form["username"]
         password = request.form["password"]
         confirmPassword = request.form["password_conformation"]
+        address = request.form["address"]
+        plz = request.form["plz"]
+        restaurantname = request.form["restaurantname"]
+        description = request.form["description"]
         
         #temporarily store input
-        session["firstname"] = firstname
-        session["lastname"] = lastname
-        session["username"] = username
         session["email"] = email
-        session["street"] = street
-        session["plz"] = plz
-        session["houseNr"] = houseNr
+        session["username"] = username
         session["password"] = password
         session["confirmPassword"] = confirmPassword
-        session["user_type"] = user_type
+        session["address"] = address
+        session["plz"] = plz
+        session["restaurantname"] = restaurantname
+        session["description"] = description
+
+        ##connect to database
+        ## NOTE ! use r before "filepath" to ensure no errors with spacing
+        connection = r"C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
+        registerManager = registrationManager(connection)
 
         ##checking unique username
         if registerManager.userNameExists(username):
@@ -122,7 +118,7 @@ def restaurant_register():
             return render_template("restaurant_register.html")
         
         ##registering
-        elif registerManager.register(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz,user_type):
+        elif registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description):
             return redirect(url_for('registration_success'))
     
     ##Linking "restaurant_register.html"
@@ -150,6 +146,9 @@ def login():
     ##role set
     role="customer"
 
+    ##connecting database
+    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+    login_manager = loginManager(connection)
 
     ##login in
     if request.method == "POST":
@@ -176,6 +175,8 @@ def restaurant_login():
     ##role set
     role ="restaurant"
 
+    ##connecting database
+    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     login_manager = loginManager(connection)
 
     ##login in
@@ -204,6 +205,8 @@ def home():
 
     if "username" in session: ## login success
 
+        ##connceting database
+        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
         conn = sqlite3.connect(connection)
         cursor = conn.cursor()
 
@@ -221,6 +224,8 @@ def home():
 @app.route('/restaurant/<string:restaurant_id>')
 def restaurant(restaurant_id):
 
+    ##connect database
+    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     conn = sqlite3.connect(connection)
     cursor = conn.cursor()
 

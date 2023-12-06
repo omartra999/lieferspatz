@@ -12,11 +12,10 @@ class registrationManager:
             result2 = self.connection.cursor().execute(restaurant_query, (username,)).fetchone()[0]
             return (result1 > 0 or result2 > 0)
     
-    def register(self, firstname, lastname, email, username, password,passwordConfirm, street, houseNr, plz,user_type):
+    def registerCustomer(self, firstname, lastname, email, username, password,passwordConfirm, street, houseNr, plz):
             cursor = self.connection.cursor()
             customer_query = "INSERT INTO customer(firstname, lastname, email, username, password, street, houseNr, plz) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            restaurant_query = "INSERT INTO restaurant(firstname, lastname, email, username, password, street, houseNr, plz) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            parameters = (firstname, lastname, email, username, password, street, houseNr, plz)
+            parameters_customer = (firstname, lastname, email, username, password, street, houseNr, plz)
             if self.userNameExists(username):
                 return False, "username already exists"
             
@@ -24,11 +23,22 @@ class registrationManager:
               return False, "passwords do not match" 
             else:
                 with self.connection:
-                    if user_type == "customer":
-                        cursor.execute(customer_query, parameters)
+                        cursor.execute(customer_query, parameters_customer)
                         return True, "customer added"
-                    elif user_type == "restaurant":
-                        cursor.execute(restaurant_query, parameters)
+
+    def registerRestaurant(self, email, username, password,passwordConfirm, address, plz, restaurantname, description):
+            cursor = self.connection.cursor()
+            restaurant_query = "INSERT INTO restaurant(email, username, password, address, plz, restaurantname, description) VALUES (?, ?, ?, ?, ?, ?, ?)"
+           
+            parameters_restaurant = (email, username, password, address, plz, restaurantname, description)
+            if self.userNameExists(username):
+                return False, "username already exists"
+            
+            elif password != passwordConfirm:
+              return False, "passwords do not match" 
+            else:
+                with self.connection:
+                        cursor.execute(restaurant_query, parameters_restaurant)
                         return True, "restaurant added"
                     
 
