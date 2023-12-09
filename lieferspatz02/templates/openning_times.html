@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Registration Form{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+        <form action = # class="form-group" method="POST">
+        <div id = day>
+            <div class="form-container">
+            <label for="days">Day: </label>
+            <select id="days" name="days[]">
+                <option value="monday">monday</option>
+                <option value="tuesday">tuesday</option>
+                <option value="wedensday">wedensday</option>
+                <option value="thirsday">thirsday</option>
+                <option value="friday">friday</option>
+                <option value="saturday">saturday</option>
+                <option value="sunday">sunday</option>
+            </select><br><br>
+            <label for="open_time">Opening Time:</label>
+            <input type="time" name = "open_time[]"><br><br>
+            <label for="close_time">Closing Time</label>
+            <input type="time" name = "close_time[]"><br><br>
+            </div>
+        </div>
+        <button type="button" onclick="addDay()">+</button>
+        <input type="submit" value="Submit">
+        </form>
+
+        <script>
+            function addDay(){
+                const daysDiv = document.getElementById('day');
+                const newDayDiv = document.createElement('div');
+                newDayDiv.className = 'form-container';
+
+                const dayLabel = document.createElement('label');
+                dayLabel.textContent = "Day";
+                dayLabel.htmlFor = "days";
+
+                const daySelect = document.createElement('select');
+                daySelect.name = 'days[]';
+                const days = ['monday','tuesday','wedensday','thirsday','friday','saturday','sunday'];
+                days.forEach(day =>{
+                    const option = document.createElement('option');
+                    option.value = day;
+                    option.textContent = day;
+                    daySelect.appendChild(option);
+                });
+
+                const openLabel = document.createElement('label');
+                openLabel.textContent = "Opening Time";
+                openLabel.htmlFor = "open_time";
+
+                const openingInput = document.createElement('input');
+                openingInput.type = 'time';
+                openingInput.name = 'open_time[]';
+
+                const closeLabel = document.createElement('label');
+                closeLabel.textContent = "Closing Time";
+                closeLabel.htmlFor = "close_time";
+
+                const closingInput = document.createElement('input');
+                closingInput.type = 'time';
+                closingInput.name = 'close_time[]';
+
+                newDayDiv.appendChild(dayLabel);
+                newDayDiv.appendChild(daySelect);
+
+                newDayDiv.appendChild(openLabel);
+                newDayDiv.appendChild(openingInput);
+
+                newDayDiv.appendChild(closeLabel);
+                newDayDiv.appendChild(closingInput);
+
+                daysDiv.appendChild(newDayDiv);
+            }
+        </script>
+        {% endblock %}
