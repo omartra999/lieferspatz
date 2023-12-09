@@ -2,12 +2,14 @@ from flask import Flask, redirect, url_for, render_template, request,session, fl
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
 from MenuManager import menuManager
+from TimeManager import timeManager
 import sqlite3
 import os
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
+connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -17,7 +19,7 @@ def role():
 
         ##redirecting to according URL
         if selected_role == "customer":
-            return redirect(url_for("customer_register"))
+            return redirect(url_for("register"))
         
         elif selected_role == "restaurant":
             return redirect(url_for("restaurant_register"))
@@ -30,10 +32,12 @@ def role():
        return render_template("index.html")
     
 
-@app.route("/customer_register", methods = ["POST", "GET"])
-def customer_register():
-
+@app.route("/register", methods = ["POST", "GET"])
+def register():
+    registerManager = registrationManager(connection)
     if request.method == "POST":
+        ## role set
+        user_type = "customer"
         ## request from html
         firstname = request.form["firstname"]
         lastname = request.form["lastname"]
@@ -55,18 +59,11 @@ def customer_register():
         session["houseNr"] = houseNr
         session["password"] = password
         session["confirmPassword"] = confirmPassword
-    
-        ##connect to database
-        connection = "C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
-        registerManager = registrationManager(connection)
+        session["usertype"] = "customer"
 
-        ##checking unique username
-        if registerManager.userNameExists(username):
-            flash("username exists in database")
-            return render_template("customer_register.html")
-        
+
         ##comfirming password 
-        elif password != confirmPassword:
+        if password != confirmPassword:
             flash("passwords do not match")
             return render_template("customer_register.html")
         
@@ -80,6 +77,7 @@ def customer_register():
 
 @app.route("/restaurant_register", methods = ["POST", "GET"])
 def restaurant_register():
+    registerManager = registrationManager(connection)
     if request.method == "POST":
             
         ## request from html
@@ -102,24 +100,19 @@ def restaurant_register():
         session["restaurantname"] = restaurantname
         session["description"] = description
 
-        ##connect to database
-        ## NOTE ! use r before "filepath" to ensure no errors with spacing
-        connection = r"C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
-        registerManager = registrationManager(connection)
 
-        ##checking unique username
-        if registerManager.userNameExists(username):
-            flash("username exists in database")
-            return render_template("restaurant_register.html") 
-        
         ##comfirming password 
-        elif password != confirmPassword:
+        if password != confirmPassword:
             flash("passwords do not match")
             return render_template("restaurant_register.html")
         
         ##registering
         elif registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description):
-            return redirect(url_for('registration_success'))
+            #retrive restaurant id from the database
+            restaurant_id = registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description)
+            #store the id
+            session["restaurant_id"] = restaurant_id
+            return redirect(url_for('add_opening_time'))
     
     ##Linking "restaurant_register.html"
     else:    
@@ -142,13 +135,11 @@ def registration_success():
 
 @app.route("/login", methods = ["POST","GET"])
 def login():
+    login_manager = loginManager(connection)
 
     ##role set
     role="customer"
 
-    ##connecting database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-    login_manager = loginManager(connection)
 
     ##login in
     if request.method == "POST":
@@ -175,8 +166,6 @@ def restaurant_login():
     ##role set
     role ="restaurant"
 
-    ##connecting database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     login_manager = loginManager(connection)
 
     ##login in
@@ -198,20 +187,45 @@ def restaurant_login():
     else:
         return render_template("restaurant_login.html")
     
-    
+#add open hours for a restaurant     
+@app.route("/add_opening_time", methods = ["POST","GET"])
+def add_opening_time():
+    if request.method == "POST":
+        #request restaurant id
+        restaurant_id = session.get('restaurant_id')
+
+        if not restaurant_id :
+            flash("restaurant id not found please make sure you are logged in")
+            return render_template("openning_times.html")
+        
+        days = request.form.getlist('days')
+        open_times = request.form.getlist('open_time')
+        closing_times = request.form.getlist('close_time')
+
+        time_manager = timeManager(connection)
+        success = time_manager.add_openning_times(restaurant_id, days, open_times, closing_times)
+        if success:
+            flash("opening times added successfuly")
+            return render_template("openning_times.html")
+        else:
+            flash("opening times were not added")
+            return render_template("openning_times.html")
+    else:
+        return render_template("openning_times.html")
+
+
+
     
 @app.route("/home")
 def home():
 
     if "username" in session: ## login success
 
-        ##connceting database
-        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
         conn = sqlite3.connect(connection)
         cursor = conn.cursor()
 
         ##retrieveing data
-        cursor.execute("SELECT username, street, houseNr FROM restaurant")
+        cursor.execute("SELECT restaurantname, address, plz FROM restaurant")
         restaurants = cursor.fetchall()
         conn.close()
 
@@ -224,8 +238,6 @@ def home():
 @app.route('/restaurant/<string:restaurant_id>')
 def restaurant(restaurant_id):
 
-    ##connect database
-    connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
     conn = sqlite3.connect(connection)
     cursor = conn.cursor()
 
@@ -276,8 +288,7 @@ def create_menu(restaurant_id):
         session["item_name"] = item_name
         session["detail"] = detail
         session["price"] = price
-        ##connect to database
-        connection ="D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+        
         menu = menuManager(connection)
 
         ##checking unique username
