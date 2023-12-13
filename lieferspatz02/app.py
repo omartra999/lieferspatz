@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, render_template, request,session, flash
+from werkzeug.datastructures import MultiDict
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
 from MenuManager import menuManager
@@ -100,19 +101,19 @@ def restaurant_register():
         session["restaurantname"] = restaurantname
         session["description"] = description
 
+        restaurant_id = registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description)
+
 
         ##comfirming password 
         if password != confirmPassword:
             flash("passwords do not match")
             return render_template("restaurant_register.html")
         
-        ##registering
-        elif registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description):
-            #retrive restaurant id from the database
-            restaurant_id = registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description)
-            #store the id
-            session["restaurant_id"] = restaurant_id
-            return redirect(url_for('add_opening_time'))
+        ##registering and retrive restaurant id from the database
+        elif restaurant_id is not None:
+                #store the id
+                session["restaurant_id"] = restaurant_id
+                return redirect(url_for('add_opening_time'))
     
     ##Linking "restaurant_register.html"
     else:    
@@ -191,6 +192,7 @@ def restaurant_login():
 @app.route("/add_opening_time", methods = ["POST","GET"])
 def add_opening_time():
     if request.method == "POST":
+        form_data = MultiDict(request.form)
         #request restaurant id
         restaurant_id = session.get('restaurant_id')
 
@@ -198,12 +200,22 @@ def add_opening_time():
             flash("restaurant id not found please make sure you are logged in")
             return render_template("openning_times.html")
         
-        days = request.form.getlist('days')
-        open_times = request.form.getlist('open_time')
-        closing_times = request.form.getlist('close_time')
+        days = []
+        open_times = []
+        close_times = []
 
+    # Loop through form data and extract values based on keys containing 'days[', 'open_time[', 'close_time['
+        for key, value in form_data.items():
+            if key.startswith('days['):
+                days.append(value)
+            elif key.startswith('open_time['):
+                open_times.append(value)
+            elif key.startswith('close_time['):
+                close_times.append(value)
+
+        print("raw entered data: " ,restaurant_id,days,open_times,close_times)
         time_manager = timeManager(connection)
-        success = time_manager.add_openning_times(restaurant_id, days, open_times, closing_times)
+        success = time_manager.add_openning_times(restaurant_id, days, open_times, close_times)
         if success:
             flash("opening times added successfuly")
             return render_template("openning_times.html")
@@ -213,9 +225,6 @@ def add_opening_time():
     else:
         return render_template("openning_times.html")
 
-
-
-    
 @app.route("/home")
 def home():
 

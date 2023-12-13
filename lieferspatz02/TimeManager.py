@@ -1,22 +1,36 @@
 import sqlite3
-
-import time
 class timeManager:
     def __init__(self, connection):
         self.connection = sqlite3.connect(connection)
         self.cursor = self.connection.cursor()
 
-    def add_openning_times(self, restaurant_id, days, opens, closes):
-        formatted_open_times = [time.strftime("%H:%M") for time in opens]
-        formatted_close_times = [time.strftime("%H:%M") for time in closes]
-        query = "INSERT INTO openning_times(restaurant_id, day, open, close) VALUES (?,?,?,?)"
-        data = [(restaurant_id, day, open_time, close_time) for day, open_time, close_time in zip(days, formatted_open_times, formatted_close_times)]
-        
-        with self.connection:
-            self.cursor.executemany(query, data)
-            self.connection.commit()
-            return True
-            
+    def dayExists(self, restaurant_id, day):
+        try:
+            with self.connection:
+                query = "SELECT COUNT (*) FROM openning_times WHERE restaurant_id = ?"
+                self.cursor.execute(query, restaurant_id,)
+                count = self.cursor.fetchone()[0]
+                return count > 0
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+
+
+    def add_openning_times(self, restaurant_id_tuple, days, opens, closes):
+        restaurant_id = restaurant_id_tuple[1]
+        print(f"extracted restaurant id form session : {restaurant_id}")
+        try:
+            with self.connection:
+                for day, open, close in zip(days, opens, closes):
+                    query = "INSERT INTO openning_times(restaurant_id, day, open, close) VALUES (?,?,?,?)"
+                    if self.dayExists(restaurant_id,day) == False:
+                        self.cursor.execute(query, (restaurant_id, day, open, close))
+                self.connection.commit()
+                return True
+        except Exception as e:
+            print(f"An error accured: {e}")
+            return False
+                    
     def get_openning_times(self, restaurant_id):
         query = "SELECT * FROM openning_times WHERE restaurant_id = ?"
         with self.connection:
@@ -24,3 +38,18 @@ class timeManager:
             openning_times = self.cursor.fetchall()
             return openning_times
 
+    def set_openning_times(self, restaurant_id_tuple, days, opens, closes):
+        restaurant_id = restaurant_id_tuple[1]
+        print(f"extracted restaurant id form session : {restaurant_id}")
+        try:
+            #delete existing times
+            with self.connection:
+                deleteQuery = "DELETE FROM openning_times WHERE restaurant_id = ?"
+                self.cursor.execute(deleteQuery, restaurant_id,)
+            self.connection.commit()
+            #add the new times
+            self.add_openning_times(restaurant_id,days,opens,closes)
+            return True
+        except Exception as e :
+            print(f"an error accured: {e}")
+            return False
