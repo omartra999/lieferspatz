@@ -9,90 +9,99 @@
         {% endif %}
     {% endwith %}
     
-    <form class="form-group" method="post">
-        <div id="day">
+        <form action = /add_opening_time class="form-group" method="post">
+        <div id = day>
             <div class="form-container">
-                <label for="days">Day: </label>
-                <select id="days" name="days[0]">
-                    <option value="monday">monday</option>
-                    <option value="tuesday">tuesday</option>
-                    <option value="wednesday">wednesday</option>
-                    <option value="thursday">thursday</option>
-                    <option value="friday">friday</option>
-                    <option value="saturday">saturday</option>
-                    <option value="sunday">sunday</option>
-                </select><br><br>
-                <label for="open_time">Opening Time:</label>
-               
-                <input id="open_time" type="time" name="open_time[0]"><br><br>
-
-                <label for="close_time">Closing Time</label>
-               
-                <input id="close_time" type="time" name="close_time[0]"><br><br>
+            <label for="days">Day: </label>
+            <select id="days" name="days[0]">
+                <option value="monday">monday</option>
+                <option value="tuesday">tuesday</option>
+                <option value="wedensday">wedensday</option>
+                <option value="thirsday">thirsday</option>
+                <option value="friday">friday</option>
+                <option value="saturday">saturday</option>
+                <option value="sunday">sunday</option>
+            </select><br><br>
+            <label for="open_time">Opening Time:</label>
+            <input id="open_time" type="time" name = "open_time[0]"><br><br>
+            <label for="close_time">Closing Time</label>
+            <input id="close_time" type="time" name = "close_time[0]"><br><br>
             </div>
         </div>
-        <button type="button" onclick="addDay()">+</button>
+        <button type="button" onclick="addDay()">add day</button>
         <input type="submit" value="Submit">
-    </form>
+        </form>
 
-    <script>
-        let index = 1; // Initialize index variable outside the function
+        <script>
+            let index = 1; // Initialize index variable outside the function
+        
+            function addDay() {
+                const daysDiv = document.getElementById('day');
+                const daysAdded = daysDiv.getElementsByClassName('form-container').length;
+                if (daysAdded < 7)
+                {const newDayDiv = document.createElement('div');
+                newDayDiv.className = 'form-container';
+        
+                const dayLabel = document.createElement('label');
+                dayLabel.textContent = "Day";
+                dayLabel.htmlFor = "days";
+        
+                const daySelect = document.createElement('select');
+                daySelect.name = `days[${index}]`;
+                //array for all days
+                const allDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                //getting selected days
+                const selectedDays = Array.from(daysDiv.querySelectorAll('select')).map(select => select.value);
+                //filtering out selected days
+                const availableDays = allDays.filter(day => !selectedDays.includes(day));
 
-        function addDay() {
-            const daysDiv = document.getElementById('day');
-            const newDayDiv = document.createElement('div');
-            newDayDiv.className = 'form-container';
+                availableDays.forEach(day => {
+                    const option = document.createElement('option');
+                    option.value = day;
+                    option.textContent = day;
+                    daySelect.appendChild(option);
+                });
+        
+                const openLabel = document.createElement('label');
+                openLabel.textContent = "Opening Time";
+                openLabel.htmlFor = "open_time";
+        
+                const openingInput = document.createElement('input');
+                openingInput.type = 'time';
+                openingInput.name = `open_time[${index}]`;
+        
+                const closeLabel = document.createElement('label');
+                closeLabel.textContent = "Closing Time";
+                closeLabel.htmlFor = "close_time";
+        
+                const closingInput = document.createElement('input');
+                closingInput.type = 'time';
+                closingInput.name = `close_time[${index}]`;
 
-            const dayLabel = document.createElement('label');
-            dayLabel.textContent = "Day";
-            dayLabel.htmlFor = "days";
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "delete day";
+                deleteButton.onclick = function() {
+                daysDiv.removeChild(newDayDiv);
+        };
+        
+                index++; // Increment index after assigning names
+        
+                newDayDiv.appendChild(dayLabel);
+                newDayDiv.appendChild(daySelect);
+        
+                newDayDiv.appendChild(openLabel);
+                newDayDiv.appendChild(openingInput);
+        
+                newDayDiv.appendChild(closeLabel);
+                newDayDiv.appendChild(closingInput);
 
-            const daySelect = document.createElement('select');
-            daySelect.id = `days[${index}]`;
-            daySelect.name = `days[${index}]`;
-            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            days.forEach(day => {
-                const option = document.createElement('option');
-                option.value = day;
-                option.textContent = day;
-                daySelect.appendChild(option);
-            });
-
-            const openLabel = document.createElement('label');
-            openLabel.textContent = "Opening Time";
-            openLabel.htmlFor = "open_time";
-
-            const openingInput = document.createElement('input');
-            openingInput.type = 'time';
-            openingInput.id = `open_time[${index}]`;
-            openingInput.name = `open_time[${index}]`;
-
-            const closeLabel = document.createElement('label');
-            closeLabel.textContent = "Closing Time";
-            closeLabel.htmlFor = "close_time";
-
-            const closingInput = document.createElement('input');
-            closingInput.type = 'time';
-            closingInput.id = `close_time[${index}]`;
-            closingInput.name = `close_time[${index}]`;
-
-            index++; // Increment index after assigning names
-
-            newDayDiv.appendChild(dayLabel);
-            newDayDiv.appendChild(daySelect);
-
-            newDayDiv.appendChild(openLabel);
-            newDayDiv.appendChild(openingInput);
-
-            newDayDiv.appendChild(closeLabel);
-            newDayDiv.appendChild(closingInput);
-
-            daysDiv.appendChild(newDayDiv);
-
-            // Log added elements for debugging
-            console.log(`Added day select: ${daySelect.name}`);
-            console.log(`Added opening input: ${openingInput.name}`);
-            console.log(`Added closing input: ${closingInput.name}`);
-        }
-    </script>
-{% endblock %}
+                newDayDiv.appendChild(deleteButton)
+        
+                daysDiv.appendChild(newDayDiv);
+                }
+                else{
+                    alert("you already selected all days created by god fuck you take a rest")
+                }
+            }
+        </script>
+        {% endblock %}
