@@ -4,13 +4,16 @@ from RegistrationManager import registrationManager
 from LoginManager import loginManager
 from MenuManager import menuManager
 from TimeManager import timeManager
+from PlzManager import plzManager
+from datetime import datetime
 import sqlite3
 import os
+import json
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
+connection = "C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz (2).db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -218,29 +221,75 @@ def add_opening_time():
         success = time_manager.add_openning_times(restaurant_id, days, open_times, close_times)
         if success:
             flash("opening times added successfuly")
-            return render_template("openning_times.html")
+            return redirect(url_for('manage_plz'))
         else:
             flash("opening times were not added")
             return render_template("openning_times.html")
     else:
         return render_template("openning_times.html")
+    
+@app.route('/manage_plz', methods=['GET', 'POST'])
+def manage_plz():
+    restaurant_id = session.get('restaurant_id')
+    plzList = []
+    plz_manager = plzManager(connection)
+    
+    if request.method == 'POST':
+
+        action = request.form.get('action')
+        if action == 'add_plz_to_list':
+            plz_value = request.form.get('plz')
+            # Add the PLZ value to the list in the plz_manager instance
+            plzList.append(plz_value)
+            print("list: ", plzList)
+            flash("PLZ added successfully")
+            return render_template('manage_plz.html')
+
+        elif action == 'submit_plz_list':
+            plz_list_json = json.dumps(plzList)
+            # If the user submitted without entering a PLZ, submit the existing PLZ list
+            success = plz_manager.submit_plz_list(restaurant_id, plz_list_json)
+            if success:
+                flash("PLZ list submitted successfully")
+                session['plzList'] = plzList
+                plzList = []
+                return render_template('manage_plz.html')
+            else:
+                flash("Failed to submit PLZ list")
+                plzList = []
+                return render_template('manage_plz.html')
+            
+    else:
+        return render_template('manage_plz.html')
 
 @app.route("/home")
 def home():
-
     if "username" in session: ## login success
-
         conn = sqlite3.connect(connection)
         cursor = conn.cursor()
-
         ##retrieveing data
-        cursor.execute("SELECT restaurantname, address, plz FROM restaurant")
+        cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
         restaurants = cursor.fetchall()
+        cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
+        openning_times = cursor.fetchall()
+
         conn.close()
 
+        # Get the current day and time
+        current_day = datetime.now().strftime("%A")
+        current_time = datetime.now().strftime("%H:%M")
+
+        # Filter out restaurants that are not open at the current time
+        open_restaurants = []
+        for restaurant in restaurants:
+            for time in openning_times:
+                if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
+                    if time[2] <= current_time <= time[3]:
+                        open_restaurants.append(restaurant)
+                        break
+
         ##Link home.html and all the restaurant
-        return render_template("home.html",restaurants=restaurants)
-    
+        return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times)    
     else: ## login failed
         return redirect(url_for("login"))
 
