@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Manage PLZ{% endblock %}
+{% block content %}
+    <h2>Manage PLZ</h2>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('manage_plz') }}" class="form-group" method="POST">
+        <label for="plz">PLZ:</label>
+        <input type="text" name="plz" id="plz" required>
+        <button type="submit" name="action" value="add_plz_to_list">Add PLZ</button>
+    </form>
+    <form action="{{ url_for('manage_plz') }}" method="POST">
+        <button type="submit" name="action" value="submit_plz_list">Submit</button>
+    </form>
+    <h4>Current PLZ List:</h4>
+    <ul>
+        {% for plz in plz_list %}
+            <li>{{ plz }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
