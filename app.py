@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request,session, flash
 from werkzeug.datastructures import MultiDict
+from datetime import datetime
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
 from MenuManager import menuManager
@@ -242,8 +243,21 @@ def home():
 
         conn.close()
 
+        # Get the current day and time
+        current_day = datetime.now().strftime("%A")
+        current_time = datetime.now().strftime("%H:%M")
+
+        # Filter out restaurants that are not open at the current time
+        open_restaurants = []
+        for restaurant in restaurants:
+            for time in openning_times:
+                if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
+                    if time[2] <= current_time <= time[3]:
+                        open_restaurants.append(restaurant)
+                        break
+
         ##Link home.html and all the restaurant
-        return render_template("home.html",restaurants=restaurants,openning_times=openning_times)
+        return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times)
     
     else: ## login failed
         return redirect(url_for("login"))
