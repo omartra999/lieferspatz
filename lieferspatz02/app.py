@@ -1,24 +1,26 @@
+import json
 from flask import Flask, redirect, url_for, render_template, request,session, flash
 from werkzeug.datastructures import MultiDict
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
-from MenuManager import menuManager
 from TimeManager import timeManager
+from Restaurant import _restaurant
 from PlzManager import plzManager
 from datetime import datetime
+from decorator import login_required_customer,login_required_restaurant
 import sqlite3
+
 import os
-import json
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz (2).db"
+connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
     if request.method == "POST":
-        ##requesting  role
+        ##requesting role
         selected_role = request.form['role']
 
         ##redirecting to according URL
@@ -65,7 +67,6 @@ def register():
         session["confirmPassword"] = confirmPassword
         session["usertype"] = "customer"
 
-
         ##comfirming password 
         if password != confirmPassword:
             flash("passwords do not match")
@@ -106,7 +107,6 @@ def restaurant_register():
 
         restaurant_id = registerManager.registerRestaurant(email, username, password, confirmPassword, address, plz, restaurantname, description)
 
-
         ##comfirming password 
         if password != confirmPassword:
             flash("passwords do not match")
@@ -116,6 +116,7 @@ def restaurant_register():
         elif restaurant_id is not None:
                 #store the id
                 session["restaurant_id"] = restaurant_id
+                session["logged_in_restaurant"] = True
                 return redirect(url_for('add_opening_time'))
     
     ##Linking "restaurant_register.html"
@@ -141,18 +142,16 @@ def registration_success():
 def login():
     login_manager = loginManager(connection)
 
-    ##role set
-    role="customer"
-
-
     ##login in
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
         ##id check
-        if login_manager.login(username, password,role):##success
+        login = login_manager.loginCustomer(username, password,role)
+        if login:##success
             session["username"] = username
+            session["logged_in"] = True
             flash("login successfuly")
             return redirect(url_for("home"))
         
@@ -166,10 +165,6 @@ def login():
 
 @app.route("/restaurant_login", methods = ["POST","GET"])
 def restaurant_login():
-
-    ##role set
-    role ="restaurant"
-
     login_manager = loginManager(connection)
 
     ##login in
@@ -178,10 +173,25 @@ def restaurant_login():
         password = request.form["password"]
 
         ##id check
-        if login_manager.login(username, password,role):##success
+        login = login_manager.loginRestaurant(username, password)
+        if login:##success
+            session["logged_in_restaurant"] = True
             session["username"] = username
+            restaurant_name = login[2]
+            session["restaurant_name"] = restaurant_name
+            restaurant_id = login[3]
+            session["restaurant_id"] = restaurant_id
+            address = login[4]
+            session["address"] = address
+            plz = login[5]
+            session["plz"] = plz
+            email = login[6]
+            session["email"] = email
+            description = login[7]
+            session["description"] = description
+            
             flash("login successfuly")
-            return redirect(url_for("it_work"))                                 ##NOT DONE
+            return redirect(url_for('restaurant_home')) 
         
         else:##failed
             flash("login failed check input")
@@ -191,9 +201,97 @@ def restaurant_login():
     else:
         return render_template("restaurant_login.html")
     
+@app.route("/restaurant_home", methods = ["POST","GET"])
+@login_required_restaurant
+def restaurant_home():
+    restaurant_id = session['restaurant_id']
+    time_manager = timeManager(connection)
+    restaurant = _restaurant(restaurant_id, connection)
+    if ('restaurant_name') in session and ('restaurant_id') in session:
+        restaurant_name = session['restaurant_name']
+        address = session['address']
+        plz = session['plz']
+        email = session['email']
+        description = session['description']
+        username = session['username']
+
+        menu = restaurant.getMenu()
+             
+        print( "id: ",restaurant_id)
+        print("Name:",restaurant_name)
+        opening_times = time_manager.get_openning_times(restaurant_id)
+        print("times:",opening_times)
+        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True,items = menu)
+    else:
+        return redirect(url_for('restaurant_login'))
+
+@app.route("/edit_restaurant_data", methods = ["POST","GET"])
+@login_required_restaurant
+def edit_restaurant_data():
+    if request.method == "POST":
+        return render_template("restaurant_home.html", should_show_edit_form = True, should_show_edit_button = False)
+    else:
+        return redirect(url_for("restaurant_home"))
+    
+@app.route("/update_profile", methods = ["POST","GET"])
+@login_required_restaurant
+def update_profile():
+    restaurant_id = session['restaurant_id']
+    _restaurant_ = _restaurant(restaurant_id, connection) 
+    if request.method == "POST":
+        new_username = request.form.get('username')
+        new_restaurant_name = request.form.get('restaurant_name')
+        new_address = request.form.get('address')
+        new_plz = request.form.get('plz')
+        new_email = request.form.get('email')
+        new_des = request.form.get('description')
+
+        if new_username:
+            _restaurant_.set_username(new_username)
+            session['username'] = _restaurant_.get_username()
+        if new_restaurant_name:
+            _restaurant_.set_restaurant_name(new_restaurant_name)
+            session['restaurant_name'] = _restaurant_.get_restaurant_name()
+            print("new name: ", session['restaurant_name'])
+        if new_address:
+            _restaurant_.set_address(new_address)
+            session['address'] = _restaurant_.get_address()
+        if new_plz :
+            _restaurant_.set_plz(new_plz)
+            session['plz'] = _restaurant_.get_plz()
+        if new_email:
+            _restaurant_.set_email(new_email)
+            session['email'] = _restaurant_.get_email()
+        if new_des:
+            _restaurant_.set_description(new_des)
+            session['description'] = _restaurant_.get_description()
+        flash("profile edited successfuly")
+        return redirect(url_for('restaurant_home'))
+
+    else:
+        return url_for('edit_restaurant_data')
+
+@app.route("/logout_restaurant", methods = ["POST","GET"])
+@login_required_restaurant
+def logout_restaurant():
+    if request.method == "POST":
+        session.pop('restaurant_name', None)
+        session.pop('restaurant_id', None)
+        session.pop('logged_in_restaurant', None)
+        session.pop('username',None)
+
+        return redirect(url_for('restaurant_login'))
+    else:
+        return redirect(url_for('restaurant_home'))
+
+
+    
 #add open hours for a restaurant     
 @app.route("/add_opening_time", methods = ["POST","GET"])
+@login_required_restaurant
 def add_opening_time():
+    show_set_form = False
+    show_add_form = True
     if request.method == "POST":
         form_data = MultiDict(request.form)
         #request restaurant id
@@ -201,7 +299,7 @@ def add_opening_time():
 
         if not restaurant_id :
             flash("restaurant id not found please make sure you are logged in")
-            return render_template("openning_times.html")
+            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
         
         days = []
         open_times = []
@@ -221,14 +319,123 @@ def add_opening_time():
         success = time_manager.add_openning_times(restaurant_id, days, open_times, close_times)
         if success:
             flash("opening times added successfuly")
-            return redirect(url_for('manage_plz'))
+            return redirect(url_for('restaurant_home', ))
         else:
             flash("opening times were not added")
-            return render_template("openning_times.html")
+            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
     else:
-        return render_template("openning_times.html")
-    
-@app.route('/manage_plz', methods=['GET', 'POST'])
+        return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+@app.route("/edit_opening_times", methods = ["POST","GET"])
+@login_required_restaurant
+def edit_opening_times():
+    restaurant_id = session.get('restaurant_id')
+    session['restaurant_id'] = restaurant_id
+    print(restaurant_id)
+    if request.method == "POST":
+       return redirect(url_for('set_opening_times'))
+    else:
+        return render_template('restaurant_home.html')
+
+@app.route("/set_opening_times", methods = ["POST","GET"])
+@login_required_restaurant
+def set_opening_times():
+    show_add_form = False
+    show_set_form = True
+    restaurant_id = session.get('restaurant_id')
+    print("id:",restaurant_id)
+    if request.method == "POST":
+        form_data = MultiDict(request.form)
+        #request restaurant id
+        if not restaurant_id :
+            flash("restaurant id not found please make sure you are logged in")
+            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+        
+        days = []
+        open_times = []
+        close_times = []
+
+    # Loop through form data and extract values based on keys containing 'days[', 'open_time[', 'close_time['
+        for key, value in form_data.items():
+            if key.startswith('days['):
+                days.append(value)
+            elif key.startswith('open_time['):
+                open_times.append(value)
+            elif key.startswith('close_time['):
+                close_times.append(value)
+
+        print("raw entered data: " ,restaurant_id,days,open_times,close_times)
+        time_manager = timeManager(connection)
+        success = time_manager.set_openning_times(restaurant_id, days, open_times, close_times)
+        if success:
+            flash("opening times changed successfuly")
+            return redirect(url_for('restaurant_home',id = restaurant_id ))
+        else:
+            flash("please try again an error accured")
+            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+    else:
+        return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+
+
+
+@app.route("/home")
+@login_required_customer
+def home():
+        if "username" in session: ## login success
+            conn = sqlite3.connect(connection)
+            cursor = conn.cursor()
+        ##retrieveing data
+            cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
+            restaurants = cursor.fetchall()
+            cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
+            openning_times = cursor.fetchall()
+
+            conn.close()
+
+        # Get the current day and time
+            current_day = datetime.now().strftime("%A")
+            current_time = datetime.now().strftime("%H:%M")
+
+        # Filter out restaurants that are not open at the current time
+            open_restaurants = []
+            for restaurant in restaurants:
+                for time in openning_times:
+                    if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
+                        if time[2] <= current_time <= time[3]:
+                            open_restaurants.append(restaurant)
+                            break
+
+        ##Link home.html and all the restaurant
+            return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times)    
+        else: ## login failed
+            return redirect(url_for("login"))
+
+
+@app.route("/edit_menu", methods = ["POST","GET"])
+@login_required_restaurant
+def edit_menu():
+    if request.method == "POST":
+        return render_template("restaurant_home.html",show_menu_button = False, show_menu_form = True)
+    else:
+        return url_for("restaurant_home")
+        
+@app.route("/delete_items", methods=["GET", "POST"])
+@login_required_restaurant
+def delete_items():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    if request.method == "POST":
+        items_to_delete = request.form.getlist("items_to_delete")
+        print(items_to_delete)
+        for item in items_to_delete:
+            if restaurant.delete_item(item_name=item):
+                flash("Items deleted successfully")
+            else:
+                flash("an error accured")
+        return redirect(url_for("restaurant_home"))
+
+    items = restaurant.getMenu()  # Fetch menu items for display
+    return render_template("delete_items.html", items=items)
+@app.route('manage_plz',methods = ["POST","GET"])
 def manage_plz():
     restaurant_id = session.get('restaurant_id')
     plzList = []
@@ -262,113 +469,32 @@ def manage_plz():
     else:
         return render_template('manage_plz.html')
 
-@app.route("/home")
-def home():
-    if "username" in session: ## login success
-        conn = sqlite3.connect(connection)
-        cursor = conn.cursor()
-        ##retrieveing data
-        cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
-        restaurants = cursor.fetchall()
-        cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
-        openning_times = cursor.fetchall()
+@app.route("/add_items", methods = ["POST", "GET"])
+@login_required_restaurant
+def add_items():
 
-        conn.close()
-
-        # Get the current day and time
-        current_day = datetime.now().strftime("%A")
-        current_time = datetime.now().strftime("%H:%M")
-
-        # Filter out restaurants that are not open at the current time
-        open_restaurants = []
-        for restaurant in restaurants:
-            for time in openning_times:
-                if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
-                    if time[2] <= current_time <= time[3]:
-                        open_restaurants.append(restaurant)
-                        break
-
-        ##Link home.html and all the restaurant
-        return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times)    
-    else: ## login failed
-        return redirect(url_for("login"))
-
-@app.route('/restaurant/<string:restaurant_id>')
-def restaurant(restaurant_id):
-
-    conn = sqlite3.connect(connection)
-    cursor = conn.cursor()
-
-    ##fetch restaurant info
-    cursor.execute("SELECT * FROM restaurant WHERE username=?", (restaurant_id,))
-    restaurant_info = cursor.fetchone()
-
-    ##fetch menu
-    cursor.execute("SELECT * FROM menu WHERE restaurant=?", (restaurant_id,))
-    menu = cursor.fetchall()
-    conn.close()
-
-    ##getting info
-    if restaurant_info:
-        ##columns are in order: id[0], first_name[1], last_name[2],street[3],houseNr[4]
-        ##plz[5], email[6], username[7], password[9]
-        restaurant = {
-            'id': restaurant_info[0],
-            'first_name': restaurant_info[1],
-            'last_name': restaurant_info[2],
-            'street': restaurant_info[3],
-            'houseNr': restaurant_info[4],
-            'plz':restaurant_info[5],
-            'email':restaurant_info[6],
-            'username':restaurant_info[7],
-            'menu':menu
-            # Add more columns if needed
-        }
-        return render_template('restaurant.html', restaurant=restaurant)
-    else:
-        return "Restaurant not found."
-
-
-
-
-##temp create menu for testing
-@app.route("/create_menu/<string:restaurant_id>", methods = ["POST", "GET"])
-def create_menu(restaurant_id):
-
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
     if request.method == "POST":
-
-        ## request from html
-        item_name = request.form["item_name"]
-        detail = request.form["detail"]
-        price = request.form["price"]
+      
+        item_name = request.form.get('item_name')
+        detail = request.form.get('detail')
+        price = request.form.get('price')
+        type = request.form.get('type')
         
-        #temporarily store input
-        session["item_name"] = item_name
-        session["detail"] = detail
-        session["price"] = price
-        
-        menu = menuManager(connection)
-
-        ##checking unique username
-        if menu.item_exist(item_name):
-            flash("item exists")
-            return render_template("create_item.html", restaurant=restaurant_id)
-        
-        
-        ##registering
-        elif menu.create_item(restaurant_id,item_name, detail, price):
-            return redirect(url_for("restaurant", restaurant_id=restaurant_id))
-    
-    ##linking to "customer_register.html" 
-    else:
-        return render_template("create_item.html",restaurant=restaurant_id)
-
-##testing
-@app.route("/it_work")
-def it_work():
-    return render_template("create_menu.html")  
-
+        print("Item Name: ", item_name)
   
+        if restaurant.add_item(item_name, detail, price, type):
+            items = restaurant.getMenu()
+            flash("item added successfuly")
+            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items)
+        else:
+            flash("Items are not added some Error accured")
+            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
+    else:
+        return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
     print(currentDirectory)
