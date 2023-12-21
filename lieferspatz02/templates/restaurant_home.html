@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block button %}
+<form action="/logout_restaurant" method="POST">
+    <input type="submit" value="Logout" class="button-link">
+</form>
+{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <h1>Welcome, {{ restaurantName }}!</h1>
+    <div class = "form-group">
+        <ul>
+            <li>Restaurant Name: <span>{{ restaurantName }}</span></li>
+            <li>Username: <span>{{ userName }}</span></li>
+            <li>Address: <span>{{ restaurantAddress }}</span></li>
+            <li>PLZ: <span>{{ Postal }}</span></li>
+            <li>Email: <span>{{ mail }}</span></li>
+        </ul>
+        <h3>Description:</h3>
+        <p>{{ des }}</p>
+        {% if should_show_edit_button %}
+        <form action="/edit_restaurant_data" method="POST">
+            <button type="submit" value="edit_restaurant_data" class="button-link">Edit Profile</button></form>{% endif %}
+    </div>
+    {% if  should_show_edit_form %}
+        <form action="/update_profile" method = "POST" class="form-group">
+            <label for = "restaurant_name">Restaurant Name:</label>
+            <input type="text" name="restaurant_name" id = "restaurant_name" class="transparent-input"><br><br>
+            <label for = "username">Username: </label>
+            <input type = "text" name="username" id="username" class="transparent-input"><br><br>
+            <label for = "address">Address</label>
+            <input type="text" name="address" id="address" class="transparent-input"> <br><br>
+            <label for = "plz">plz</label>
+            <input type="number" name="plz" id="plz" class="transparent-input"><br><br>
+            <label for = "email">Email</label>
+            <input type="email" name="email" id="email" class="transparent-input"><br><br>
+            <label for = "description">Description</label><br><br>
+            <textarea name="description" id="description" class="transparent-input" rows="5" cols="10"></textarea><br><br>
+            
+            <button type="submit" value="submit" class="button-link">Submit</button>
+
+        </form>
+    {% endif %}
+    <div class = "form-group">
+        <h3>Menu</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item[0] }}</td>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+  
+        {% if show_menu_button %}
+        <form action="/edit_menu" method="POST">
+        <button type = "submit" value = "submit" class="button-link">Edit Menu</button>
+        </form>
+    <br>
+        {% endif %}
+    </div>
+        {% if show_menu_form %}
+        <div class="form-group">
+        <form action="/add_items" method="POST" class="form-group">
+            <label for = "item_name">Item Name</label>
+            <input type="text" name="item_name" id="item_name" class="transparent-input"><br><br>
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0"><br><br>
+            <label for="detail">Details</label><br>
+            <textarea id="detail" name="detail" rows="5" cols="25" class="transparent-input"></textarea><br><br>
+            <label for = "type">Type</label>
+            <select id="type" name="type" class="transparent-input">
+                <option value="food">Food</option>
+                <option value="drink">Drink</option>
+            </select><br><br>
+
+
+            <button type="submit" value="submit" class="button-link">add item</button>
+            <a href = /delete_items class = "button-link">Delete Items from menu</a>
+            <a href="/restaurant_home" class="button-link"> back to profile page </a>
+        </form>
+        <div id = "updated_menu">
+            <h4>Menu after Update</h4>
+            <ul>
+                {% for item in addedItems %}
+                <li><span>Item Name: </span> {{ item[0] }}</li>
+                <li><span>Item price: </span>{{ item[2] }} </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+
+
+    </div>
+<div class = "form-group">
+    <h3>Opening Times:</h3>
+    <div class="form-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Opening Time</th>
+                <th>Closing Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for time_entry in openTimes %}
+                <tr>
+                    <td>{{ time_entry[1] }}</td>
+                    <td>{{ time_entry[2] }}</td>
+                    <td>{{ time_entry[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action = "/edit_opening_times" method="POST" class = "form-settings">
+        <button type="submit" value="edit_opening_times" class="button-link">Edit Opening Hours</button>
+    </form>
+    </div>  
+    </div>
+
+
+
+
+{% endblock %}

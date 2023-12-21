@@ -3,7 +3,6 @@
 {% block button %} <a href="/register_restaurant" class="button-link">BUSINESS</a>
 <a href="/login" class="button-link">LOG IN</a>
 {% endblock %}
-{% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
@@ -11,10 +10,11 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+    {% block content %}
         <div class="form-container">
                    
             <form action = "#" method = "POST" class="form-group">
-
+                <!--register from-->
                 <p class="box-name">JOIN US</p>
 
                 <label for = "firstname">First Name: </label>
@@ -46,9 +46,10 @@
 
                 <input type="submit" value="REGISTER" class="register-button">
             </form>
+            
             <img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="Customer Registration Image" class="registration-image">
         </div>
 
         
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='customer_register.css') }}">
-{% endblock %}
+    {% endblock %}

@@ -1,24 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Lieferspatz{% endblock %}
+{% block title %}Login{% endblock %}
 {% block content %}
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-    {% for msg in messages %}
-        <p>{{msg}}</p>
-    {% endfor %}
-{% endif %}
-{% endwith %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+<h1>Welcome to the Restaurant Overview</h1>
+
 <body>
-    <h1>Restaurant Selection</h1>
-    <ul>
-        {% for restaurant in restaurants %}
-            <li>
-                <h3>{{ restaurant[0] }}</h3>
-                <p>{{ restaurant[1] }} {{ restaurant[2]}}</p>
-                <a href="/restaurant/{{ restaurant[0] }}">View Details</a>
-            </li>
-        {% endfor %}
-    </ul>
+
+    {% if restaurants %}
+        <h2>Restaurants</h2>
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    <h3>{{ restaurant[1] }}</h3>
+                    <p>Address: {{ restaurant[2] }} {{ restaurant[3] }}</p>
+                    <p>Restaurant ID: {{ restaurant[0] }}</p>
+
+                    <h4>Openning Times:</h4>
+                    <ul>
+                        {% for openning_time in openning_times %}
+                            {% if openning_time[0] == restaurant[0] %}
+                                <li>
+                                    <p>{{ openning_time[1] }}: {{ openning_time[2] }} - {{ openning_time[3] }}</p>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No restaurants available.</p>
+    {% endif %}
 </body>
-</html>
+</form>
 {% endblock %}
+

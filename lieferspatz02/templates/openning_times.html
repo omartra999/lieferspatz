@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Registration Form{% endblock %}
+{% block button %}<form action="/logout_restaurant" method="POST">
+    <input type="submit" value="Logout" class="button-link">
+</form>
+{% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -9,6 +13,7 @@
         {% endif %}
     {% endwith %}
     
+    {% if should_show_add_form %}
         <form action = /add_opening_time class="form-group" method="post">
         <div id = day>
             <div class="form-container">
@@ -28,10 +33,34 @@
             <input id="close_time" type="time" name = "close_time[0]"><br><br>
             </div>
         </div>
-        <button type="button" onclick="addDay()">add day</button>
-        <input type="submit" value="Submit">
+        <button type="button" onclick="addDay()" class="button-link">add day</button>
+        <input type="submit" value="Submit" class="button-link">
         </form>
-
+        {% endif %}
+        {% if should_show_set_form %}
+        <form action = /set_opening_times class="form-group" method="post">
+            <div id = day>
+                <div class="form-container">
+                <label for="days">Day: </label>
+                <select id="days" name="days[0]">
+                    <option value="monday">monday</option>
+                    <option value="tuesday">tuesday</option>
+                    <option value="wedensday">wedensday</option>
+                    <option value="thirsday">thirsday</option>
+                    <option value="friday">friday</option>
+                    <option value="saturday">saturday</option>
+                    <option value="sunday">sunday</option>
+                </select><br><br>
+                <label for="open_time">Opening Time:</label>
+                <input id="open_time" type="time" name = "open_time[0]"><br><br>
+                <label for="close_time">Closing Time</label>
+                <input id="close_time" type="time" name = "close_time[0]"><br><br>
+                </div>
+            </div>
+            <button type="button" onclick="addDay()" class="button-link">add day</button>
+            <input type="submit" value="Submit" class="button-link">
+            </form>
+            {% endif %}
         <script>
             let index = 1; // Initialize index variable outside the function
         

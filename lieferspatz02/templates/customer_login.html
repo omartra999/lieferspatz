@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
-{% block button %} <a href="/restaurant_login" class="button-link">BUSINESS</a>
-<a href="/register" class="button-link">REGISTER</a>
-{% endblock %}
+{% block button %}<a href = "/restaurant_login" class = "button-link">login a Buisness</a>
+<a href="/register" class="button-link">Register</a>
+<a href="/restaurant_register" class="button-link">Register a Buisness</a> {% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -11,7 +11,6 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-
     <div class="form-containerCL">
 
         <form action= # method="POST" class="form-group">
@@ -23,9 +22,7 @@
 
             <label for = "password">Password</label>
             <input type="password" class="transparent-input" name="password" id="password" required><br><br>
-    
             <input type="submit" value="LOGIN" class="register-button">
         </form>
-    </div>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='customer_register.css') }}">
+        </div>
 {% endblock %}
