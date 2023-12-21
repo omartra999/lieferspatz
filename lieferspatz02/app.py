@@ -435,7 +435,7 @@ def delete_items():
 
     items = restaurant.getMenu()  # Fetch menu items for display
     return render_template("delete_items.html", items=items)
-@app.route('manage_plz',methods = ["POST","GET"])
+@app.route('/manage_plz',methods = ["POST","GET"])
 def manage_plz():
     restaurant_id = session.get('restaurant_id')
     plzList = []
