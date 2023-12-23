@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h1>Welcome to the Restaurant Overview</h1>
+
+    <body>
+
+        {% if restaurants %}
+            <h2>Restaurants</h2>
+            <ul>
+                {% for restaurant in restaurants %}
+                    <li>
+                        <h3>{{ restaurant[1] }}</h3>
+                        <p>Address: {{ restaurant[2] }} {{ restaurant[3] }}</p>
+                        <p>Restaurant ID: {{ restaurant[0] }}</p>
+
+                        <h4>Opening Times:</h4>
+                        <ul>
+                            {% for opening_time in openning_times %}
+                                {% if opening_time[0] == restaurant[0] %}
+                                    <li>
+                                        <p>{{ opening_time[1] }}: {{ opening_time[2] }} - {{ opening_time[3] }}</p>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- "See More/See Less" button and hidden menu information -->
+                            <li>
+                                <button class="see-more-btn">See More</button>
+                                <button class="see-less-btn" style="display: none;">See Less</button>
+                                <div class="menu-info" style="display: none;">
+                                    {% set count = namespace(value=0) %}   
+                                        {% for menu in menus %}
+                                    
+                                            {% if menu[0] == restaurant[0] %}
+                                            {% set count.value = count.value + 1 %}
+                                                <!-- Updated class to add a border with off-white color -->
+                                                <div class="bordered-box">
+                                                    <p>Item Number: {{ count.value }}</p>
+                                                    <p>ITEM NAME : {{ menu[1] }}</p>
+                                                    <p>ITEM PRICE : {{ menu[2] }} EUR</p>
+                                                    <p>ITEM DESCRIPTION : {{ menu[3] }}</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No restaurants available at this time :( .</p>
+        {% endif %}
+    </body>
+
+    <style>
+        /* Updated styles for the bordered box with off-white color */
+        .bordered-box {
+            border: 2px solid #f8f8f8; 
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f8f8; /* Background color for better visibility */
+        }
+    </style>
+
+    <script>
+        // JavaScript to toggle the visibility of menu information and change button text
+        document.querySelectorAll('.see-more-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var menuInfo = this.nextElementSibling.nextElementSibling; // Get the menu information div
+                var seeLessBtn = this.nextElementSibling; // Get the See Less button
+
+                // Toggle the visibility of menu information
+                menuInfo.style.display = (menuInfo.style.display === 'none' || menuInfo.style.display === '') ? 'block' : 'none';
+
+                // Toggle the visibility of "See More" and "See Less" buttons
+                this.style.display = 'none';
+                seeLessBtn.style.display = 'inline-block';
+            });
+        });
+
+        // JavaScript to toggle the visibility of menu information and change button text
+        document.querySelectorAll('.see-less-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var menuInfo = this.nextElementSibling; // Get the menu information div
+                var seeMoreBtn = this.previousElementSibling; // Get the See More button
+
+                // Toggle the visibility of menu information
+                menuInfo.style.display = 'none';
+
+                // Toggle the visibility of "See More" and "See Less" buttons
+                this.style.display = 'none';
+                seeMoreBtn.style.display = 'inline-block';
+            });
+        });
+    </script>
+{% endblock %}
