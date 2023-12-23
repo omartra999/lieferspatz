@@ -15,7 +15,7 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
+connection = r"C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -148,7 +148,7 @@ def login():
         password = request.form["password"]
 
         ##id check
-        login = login_manager.loginCustomer(username, password,role)
+        login = login_manager.loginCustomer(username, password)
         if login:##success
             session["username"] = username
             session["logged_in"] = True
@@ -388,7 +388,8 @@ def home():
             restaurants = cursor.fetchall()
             cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
             openning_times = cursor.fetchall()
-
+            cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
+            menu = cursor.fetchall()
             conn.close()
 
         # Get the current day and time
@@ -405,7 +406,7 @@ def home():
                             break
 
         ##Link home.html and all the restaurant
-            return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times)    
+            return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times,menus=menu)    
         else: ## login failed
             return redirect(url_for("login"))
 
