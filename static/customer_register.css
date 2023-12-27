@@ -1,6 +1,7 @@
 
 body {
     background-color: #9ce5e8;
+    background-image: url('/static/images/background.png');
     margin-top: auto;
     margin-bottom: auto;
     margin-right: auto;
@@ -8,7 +9,7 @@ body {
 }
 .box-name {
     font-family: 'Montserrat', sans-serif;
-    font-size: 30px;
+    font-size: 40px;
     font-weight: bolder;
     color: #e6c2bf;
 }
@@ -23,8 +24,9 @@ body {
     margin-bottom: 10px;
     margin-right: 20px;
     margin-left: 20px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', sans-serif;   
     font-size: 20px;
+ 
 }
 .form-container{
     display: flex;
@@ -34,10 +36,19 @@ body {
     align-items: center;
     flex-direction: row;
 }
-.registration-image {
+.customer-registration-image {
     width: 100%; /* Set the width to 100% to make it fill the container */
     height: auto; /* Maintain the aspect ratio */
-    max-width: 800px; /* Set a maximum width if needed */
+    max-width: 570px; /* Set a maximum width if needed */
+    display: block; /* Ensure it's treated as a block element */
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+}
+.restaurant-registration-image {
+    width: 100%; /* Set the width to 100% to make it fill the container */
+    height: auto; /* Maintain the aspect ratio */
+    max-width: 570px; /* Set a maximum width if needed */
     display: block; /* Ensure it's treated as a block element */
     margin-top: 15px;
     margin-bottom: 15px;
@@ -47,16 +58,19 @@ body {
     background-color: rgba(255, 255, 255, 0.5); 
     border-radius: 15px;
     border-width: 0.5px;
+    font-size: 25px;
 }
 .register-button{
     background-color: #e6c2bf; 
     color: #ffffff;
     font-weight: bolder; 
-    font-size: 20px;
-    padding: 7px 20px; 
+    font-size: 25px;
+    padding: 7px 25px; 
+    margin-top: 3px;
     border: none; 
     border-radius: 50px; 
     cursor: pointer;
+    display: block;
 }
 .topnav::after {
     content: '';
@@ -112,7 +126,16 @@ body {
     align-items: center;
     justify-content: flex-start;
 }
-/*customer login page*/
+/*customer login page*/ 
+    /*animation stuff*/
+@keyframes slideInFromLeft {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
 .form-containerCL{
     display: flex;
     justify-content: space-around;
@@ -120,8 +143,30 @@ body {
     flex-basis: auto;
     align-items: center;
     flex-direction: row;
-    background-image: url('/static/images/loginC.jpg');
-    padding-top: 60px;
+    padding-top: 55px;
     padding-bottom: 60px;
     margin-top: 50px;
+     /* Apply animation */
+    animation: slideInFromLeft 0.5s ease-out; 
+}
+.name-input{
+    padding-right: 20px;
+}
+.name-input-login{
+    line-height:5px;
+    padding-right: 20px;
+}
+.form-group-login{
+    background-color: #e6fbff;  
+    padding-right: 60px; 
+    padding-left: 60px; 
+    padding-top: 30px; 
+    padding-bottom: 50px; 
+    border-radius: 45px;
+    margin-top: 10px; 
+    margin-bottom: 10px;
+    margin-right: 20px;
+    margin-left: 20px;
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 25px;   
 }
