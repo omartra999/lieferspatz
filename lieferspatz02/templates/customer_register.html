@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Registration Form{% endblock %}
-{% block button %} <a href="/register_restaurant" class="button-link">BUSINESS</a>
-<a href="/login" class="button-link">LOG IN</a>
+{% block button %}
+<a href="/restaurant_register" class="button-link">Create a business account</a>
+<a href="/customer_login" class="button-link">Customer Login</a>
 {% endblock %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for msg in messages %}
-                <p>{{msg}}</p>
-            {% endfor %}
+            <div class="flashes-container"> 
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            </div>
         {% endif %}
     {% endwith %}
     {% block content %}
@@ -47,7 +50,7 @@
                 <input type="submit" value="REGISTER" class="register-button">
             </form>
             
-            <img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="Customer Registration Image" class="registration-image">
+            <img src="{{ url_for('static', filename='images/customer_registration.png') }}" alt="Customer Registration Image" class="customer-registration-image">
         </div>
 
         

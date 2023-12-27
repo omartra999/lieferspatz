@@ -3,6 +3,17 @@
     <head>
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='customer_register.css') }}">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(function () {
+                    var flashesContainer = document.querySelector('.flashes-container');
+                    if (flashesContainer) {
+                        flashesContainer.style.display = 'none';
+                    }
+                }, 10000); // 10 seconds (10000 milliseconds)
+            });
+        </script>
+        
     </head>
     <body>
         <!--top navigation bar-->

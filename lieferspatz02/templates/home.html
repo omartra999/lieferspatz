@@ -3,9 +3,11 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for msg in messages %}
-                <p>{{msg}}</p>
-            {% endfor %}
+            <div class="flashes-container"> 
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            </div>
         {% endif %}
     {% endwith %}
 <h1>Welcome to the Restaurant Overview</h1>
@@ -40,4 +42,3 @@
 </body>
 </form>
 {% endblock %}
-

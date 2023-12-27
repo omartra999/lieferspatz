@@ -1,0 +1,29 @@
+<!--restaurant columns in order: id[0], first_name[1], last_name[2],street[3],houseNr[4],plz[5], email[6], username[7], password[9] -->
+<!--item columns in order: id[0],restaurant[1],item_name[2],detail[3],price[4]-->
+{% extends "base.html" %}
+{% block title %}Lieferspatz{% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flashes-container">
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+<h1> Welcome to {{restaurant['username']}} </h1>
+
+<body>
+    <h1>menu</h1>
+    <h2>test</h2>
+    <ul>
+        {% for item in restaurant['menu'] %}
+            <li>
+                <strong>{{ item[2] }}</strong> - {{ item[3] }} - ${{ item[4] }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+{% endblock %}
