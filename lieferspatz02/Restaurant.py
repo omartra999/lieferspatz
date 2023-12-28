@@ -226,3 +226,90 @@ class _restaurant:
         except Exception as e:
             print(f"an error accured: {e}")
             return False
+        
+    def plz_exists(self, plz):
+        try:
+            with self.connection:
+                query = "SELECT COUNT(*) FROM postal WHERE restaurant_id = ? AND plz = ?"
+                result = self.cursor.execute(query, (self.id, plz)).fetchone()[0]
+                return result > 0
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+
+    def add_plz(self, plz_list):
+        try:
+            with self.connection:
+                query = "INSERT INTO postal(restaurant_id, plz) VALUES (?, ?)"
+                for plz in plz_list:
+                    print("list: ", plz_list)
+                    if self.plz_exists(plz) == False:
+                        self.cursor.execute(query, (self.id, plz,))
+            self.connection.commit()
+            return True
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+        
+    def delete_plz(self, plz):
+        try: 
+            with self.connection:
+                for area in plz:
+                    query = "DELETE FROM postal WHERE restaurant_id = ? AND plz = ?"
+                    self.cursor.execute(query, (self.id, area,))
+                print("Deleted rows:", self.cursor.rowcount)
+            self.connection.commit()
+            return True
+        except Exception as e: 
+            print(f"an error accured: {e}")
+            return False
+    
+    def get_delivery_raduis(self):
+        try:
+            with self.connection:
+                query = "SELECT plz FROM postal WHERE restaurant_id = ?"
+                delivers = self.cursor.execute(query, (self.id,)).fetchall()
+            return delivers
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+    
+    def delivers(self, plz):
+        try: 
+            with self.connection:
+                query = "SELECT COUNT(*) FROM postal WHERE restaurant_id = ? AND plz = ?"
+                result = self.cursor.execute(query,(self.id, plz,)).fetchone()[0]
+                return result > 0
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+        
+    def get_open_orders(self):
+        try:
+            with self.connection:
+                query = "SELECT customer_id, item_id FROM orders WHERE restaurant_id = ?, status = open "
+                orders = self.cursor.execute(query, (self.id,)).fetchall()
+                return(orders)
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+
+    def update_order_status(self, order_id, status):
+        try:
+            with self.connection:
+                query = "UPDATE orders SET status = ? WHERE restaurant_id = ? AND id = ? "
+                self.cursor.execute(query,(status,self.id,order_id,))
+            self.connection.commit()
+            return True
+        except Exception as e: 
+            print(f"an error accured: {e}")
+    
+    def get_order_history(self):
+        try:
+            with self.connection:
+                query = "SELECT id, customer_id, status FROM orders WHERE restaurant_id = ?"
+                orders = self.cursor.execute(query, (self.id))
+                return orders
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False

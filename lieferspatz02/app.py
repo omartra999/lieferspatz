@@ -15,7 +15,7 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = r"C:\\Users\\User\\Documents\\.AMEERTHARAJ RELATED\\.UDE\\SEM 5\\DATENBANKEN\\PROJECT DATENBANKEN praktikum\\Lieferspatz.db"
+connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -117,7 +117,7 @@ def restaurant_register():
                 #store the id
                 session["restaurant_id"] = restaurant_id
                 session["logged_in_restaurant"] = True
-                return redirect(url_for('add_opening_time'))
+                return redirect(url_for('add_opening_time',))
     
     ##Linking "restaurant_register.html"
     else:    
@@ -216,12 +216,11 @@ def restaurant_home():
         username = session['username']
 
         menu = restaurant.getMenu()
-             
-        print( "id: ",restaurant_id)
-        print("Name:",restaurant_name)
+        delivery_range = restaurant.get_delivery_raduis()
+
         opening_times = time_manager.get_openning_times(restaurant_id)
-        print("times:",opening_times)
-        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True,items = menu)
+   
+        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True,items = menu, range = delivery_range)
     else:
         return redirect(url_for('restaurant_login'))
 
@@ -319,12 +318,12 @@ def add_opening_time():
         success = time_manager.add_openning_times(restaurant_id, days, open_times, close_times)
         if success:
             flash("opening times added successfuly")
-            return redirect(url_for('restaurant_home', ))
+            return render_template('manage_plz.html', show_skip = True)
         else:
             flash("opening times were not added")
-            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+            return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form, show_skip = True)
     else:
-        return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
+        return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form, show_skip = True)
 @app.route("/edit_opening_times", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_opening_times():
@@ -388,6 +387,7 @@ def home():
             restaurants = cursor.fetchall()
             cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
             openning_times = cursor.fetchall()
+
             cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
             menu = cursor.fetchall()
             conn.close()
@@ -395,7 +395,6 @@ def home():
         # Get the current day and time
             current_day = datetime.now().strftime("%A")
             current_time = datetime.now().strftime("%H:%M")
-
         # Filter out restaurants that are not open at the current time
             open_restaurants = []
             for restaurant in restaurants:
@@ -405,11 +404,10 @@ def home():
                             open_restaurants.append(restaurant)
                             break
 
-        ##Link home.html and all the restaurant
+        ##Link home.html and all the restaurant  
             return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times,menus=menu)    
         else: ## login failed
             return redirect(url_for("login"))
-
 
 @app.route("/edit_menu", methods = ["POST","GET"])
 @login_required_restaurant
@@ -436,7 +434,66 @@ def delete_items():
 
     items = restaurant.getMenu()  # Fetch menu items for display
     return render_template("delete_items.html", items=items)
+@app.route("/delete_area", methods = ["POST", "GET"])
+@login_required_restaurant
+def delete_area():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    if request.method == "POST":
+        areas_to_delete = request.form.getlist("areas_to_delete")
+        print( "areas to delete:", areas_to_delete)
+        if restaurant.delete_plz(areas_to_delete):
+            flash("areas deleted successfully")
+        else:
+            flash("an error accured")
+        return redirect(url_for("restaurant_home"))
+##manage_plz omar version with no json, no list, single entries
+@app.route('/add_postal', methods = ["POST","GET"])
+@login_required_restaurant
+def add_postal():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    postals = session.get('postals',[])
+    if request.method == "POST":
+        action = request.form.get('action')
+        if action == "add_postal":
+            plz = request.form.get('del_plz')
+            if plz not in postals:
+                postals.append(plz)
+                print("added: ", postals)
+            session['postals'] = postals
+
+            return render_template('manage_plz.html', plz_list = postals)
+        elif action == 'submit_postals':
+            postals = session.get('postals')
+            print(postals)
+            if restaurant.add_plz(postals) == True:
+                flash("delivery raduis updated successfuly")
+                cleaned_postals = []
+                session['postals'] = cleaned_postals
+                return redirect(url_for('restaurant_home'))
+            else:
+                flash("an error accured and raduis was not updated please try again")
+                cleaned_postals = []
+                session['postals'] = cleaned_postals
+                return redirect(url_for('add_postal'))
+    else:
+       return render_template("manage_plz.html")
+
+@app.route('/edit_range', methods = ["POST","GET"])
+@login_required_restaurant
+def edit_range():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    postals = restaurant.get_delivery_raduis()
+    if request.method == "POST":
+        return redirect(url_for('edit_range'))
+    else:
+        return render_template("edit_range.html", range = postals)
+
+##manage_plz kawthar version using json to save plz as a list
 @app.route('/manage_plz',methods = ["POST","GET"])
+@login_required_restaurant
 def manage_plz():
     restaurant_id = session.get('restaurant_id')
     plzList = []
@@ -498,4 +555,4 @@ def add_items():
 
 if __name__ == "__main__":
     app.run(debug=True)
-    print(currentDirectory)
+    print("current directory:", currentDirectory)
