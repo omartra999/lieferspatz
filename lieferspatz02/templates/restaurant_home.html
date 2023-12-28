@@ -113,6 +113,25 @@
         </div>
         {% endif %}
     </div>
+ <div class="form-group" id="delivery-div">
+
+        <h3>Delivery  Range</h3>
+        <table>
+            <thead><tr><th>Postal Code</th></tr></thead>
+            {% for area in range %}
+            <tbody>
+
+                <tr><td>{{ area[0] }}</td></tr>
+            </tbody>
+
+        </table>
+        {% endfor %}
+
+        <form action="/edit_range" method="POST">
+            <button type="submit" value="submit" class="button-link">edit delivery range</button>
+        </form>
+
+    </div>
     
 
 
