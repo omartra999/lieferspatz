@@ -219,8 +219,24 @@ def restaurant_home():
         delivery_range = restaurant.get_delivery_raduis()
 
         opening_times = time_manager.get_openning_times(restaurant_id)
+
+        # Combine variables into a single dictionary
+        template_data = {
+        "restaurantName": restaurant_name,
+        "userName": username,
+        "restaurantAddress": address,
+        "Postal": plz,
+        "mail": email,
+        "des": description,
+        "should_show_edit_button": True,
+        "show_menu_button": True,
+        "items": menu,
+        "range": delivery_range,
+        "openTimes": opening_times
+        # Add more variables as needed
+        }
    
-        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True, items = menu, range = delivery_range)
+        return render_template("restaurant_home.html", **template_data)
     else:
         return redirect(url_for('restaurant_login'))
 
