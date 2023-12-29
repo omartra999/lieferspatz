@@ -7,11 +7,9 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="flashes-container"> 
-                {% for msg in messages %}
-                    <p>{{ msg }}</p>
-                {% endfor %}
-            </div>
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
         {% endif %}
     {% endwith %}
     
@@ -24,7 +22,7 @@
                 <option value="monday">monday</option>
                 <option value="tuesday">tuesday</option>
                 <option value="wedensday">wedensday</option>
-                <option value="thirsday">thirsday</option>
+                <option value="thursday">thursday</option>
                 <option value="friday">friday</option>
                 <option value="saturday">saturday</option>
                 <option value="sunday">sunday</option>
@@ -48,7 +46,7 @@
                     <option value="monday">monday</option>
                     <option value="tuesday">tuesday</option>
                     <option value="wedensday">wedensday</option>
-                    <option value="thirsday">thirsday</option>
+                    <option value="thursday">thursday</option>
                     <option value="friday">friday</option>
                     <option value="saturday">saturday</option>
                     <option value="sunday">sunday</option>
@@ -135,5 +133,4 @@
                 }
             }
         </script>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
         {% endblock %}
