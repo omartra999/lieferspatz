@@ -17,6 +17,15 @@
     {% endwith %}
     
     <h1>Welcome, {{ restaurantName }}!</h1>
+
+    <div class="form-group">
+        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
+            <label for="logo">Upload Logo:</label>
+            <input type="file" id="logo" name="logo" accept=".jpg, .jpeg, .png" required>
+            <button type="submit" value="upload_logo" class="button-link">Upload</button>
+        </form>
+    </div>
+
     <div class = "form-group">
         <ul>
             <li>Restaurant Name: <span>{{ restaurantName }}</span></li>
