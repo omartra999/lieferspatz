@@ -220,15 +220,18 @@ def restaurant_home():
 
         opening_times = time_manager.get_openning_times(restaurant_id)
    
-        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True,items = menu, range = delivery_range)
+        return render_template("restaurant_home.html", restaurantName = restaurant_name, openTimes = opening_times, userName = username, restaurantAddress = address, Postal = plz, mail = email, des = description, should_show_edit_button = True, show_menu_button = True, items = menu, range = delivery_range)
     else:
         return redirect(url_for('restaurant_login'))
 
 @app.route("/edit_restaurant_data", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_restaurant_data():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    delivery_range = restaurant.get_delivery_raduis()
     if request.method == "POST":
-        return render_template("restaurant_home.html", should_show_edit_form = True, should_show_edit_button = False)
+        return render_template("restaurant_home.html", should_show_edit_form = True, should_show_edit_button = False, range = delivery_range)
     else:
         return redirect(url_for("restaurant_home"))
     
@@ -282,8 +285,13 @@ def logout_restaurant():
         return redirect(url_for('restaurant_login'))
     else:
         return redirect(url_for('restaurant_home'))
-
-
+    
+@app.route("/logout_customer", methods =["POST","GET"])
+@login_required_customer
+def logout_customer():
+    if request.method == "POST":
+        session.pop('username',None)
+        return redirect(url_for('login'))
     
 #add open hours for a restaurant     
 @app.route("/add_opening_time", methods = ["POST","GET"])
@@ -367,7 +375,7 @@ def set_opening_times():
         success = time_manager.set_openning_times(restaurant_id, days, open_times, close_times)
         if success:
             flash("opening times changed successfuly")
-            return redirect(url_for('restaurant_home',id = restaurant_id ))
+            return redirect(url_for('restaurant_home'))
         else:
             flash("please try again an error accured")
             return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
@@ -412,8 +420,12 @@ def home():
 @app.route("/edit_menu", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_menu():
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id,connection)
+    delivery_range = restaurant.get_delivery_raduis()
+
     if request.method == "POST":
-        return render_template("restaurant_home.html",show_menu_button = False, show_menu_form = True)
+        return render_template("restaurant_home.html",show_menu_button = False, show_menu_form = True, range = delivery_range )
     else:
         return url_for("restaurant_home")
         
@@ -545,7 +557,7 @@ def add_items():
         if restaurant.add_item(item_name, detail, price, type):
             items = restaurant.getMenu()
             flash("item added successfuly")
-            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items)
+            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items, range = restaurant.get_delivery_raduis())
         else:
             flash("Items are not added some Error accured")
             return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
