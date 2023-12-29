@@ -6,6 +6,7 @@ from LoginManager import loginManager
 from TimeManager import timeManager
 from Restaurant import _restaurant
 from PlzManager import plzManager
+from RestaurantLogo import logo
 from datetime import datetime
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
@@ -15,7 +16,7 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "D:\\Uni Duisburg Essen\\DB\\lieferspatz02\\Lieferspatz.db"
+connection = "C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -148,7 +149,8 @@ def login():
         password = request.form["password"]
 
         ##id check
-        if login_manager.loginCustomer(username, password):
+        login = login_manager.loginCustomer(username, password)
+        if login:##success
             session["username"] = username
             session["logged_in"] = True
             flash("login successfuly")
@@ -172,8 +174,8 @@ def restaurant_login():
         password = request.form["password"]
 
         ##id check
-        login = login_manager.loginRestaurant(username, password)
-        if login:##success
+        login=login_manager.loginRestaurant(username, password)
+        if login:
             session["logged_in_restaurant"] = True
             session["username"] = username
             restaurant_name = login[2]
@@ -216,6 +218,7 @@ def restaurant_home():
 
         menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
+        print(delivery_range)
 
         opening_times = time_manager.get_openning_times(restaurant_id)
 
@@ -584,6 +587,41 @@ def add_items():
 def cart():
         return render_template("cart.html")
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Define the allowed file extensions for logos
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+@app.route("/add_logo", methods=["POST", "GET"])
+@login_required_restaurant
+def add_logo():
+
+    restaurant_id = session.get('restaurant_id')
+    logo_manager = logo(connection)
+
+    if request.method == "POST":
+        ##this checks if the uploaded image has the word 'logo' in it so we're sure it's the correct file 
+        if 'logo' not in request.files:
+            flash('No file part')
+            return render_template("restaurant_home.html")
+        
+        logo_ = request.files['logo']
+
+        # If the user does not select a file, the browser submits an empty file without a filename
+        if logo_.filename == '':
+            flash('No selected file')
+            return render_template("restaurant_home.html")
+
+        if logo_ and allowed_file(logo_.filename):
+            add = logo_manager.updateRestaurantImage(restaurant_id,logo_)
+            if add:
+                flash("Logo added successfully")
+            else:
+                flash("Error occurred while adding the logo")
+    return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
