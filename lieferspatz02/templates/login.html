@@ -9,15 +9,18 @@
         {% endif %}
     {% endwith %}
 <h1>Login</h1>
-<form action= # method="POST">
+<div class="form-container">
+<form class="form-group" action= # method="POST">
     <label for = "username">username</label>
-    <input type="text" name="username" id="username" required><br><br>
+    <input class="transparent-input" type="text" name="username" id="username" required><br><br>
 
     <label for = "password">password</label>
-    <input type="password" name="password" id="password" required><br><br>
+    <input class="transparent-input" type="password" name="password" id="password" required><br><br>
     
-    <input type="submit" value="login">
+    <input type="submit" value="login" class="register-button">
 </form>
-<a href ="/register">create an account instead</a>
-<a href = "/register_restaurant">start a Buisness</a>
+<img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="login" class="registration-image">
+</div>
+<a href="/register" >create an account instead</a>
+<a href="/register_restaurant">start a Buisness</a>
 {% endblock %}

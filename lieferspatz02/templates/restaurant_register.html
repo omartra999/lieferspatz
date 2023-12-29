@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Registration Form{% endblock %}
 {% block button %} 
-<a href="/customer_register" class="button-link">Create a customer account</a>
+<a href="/register" class="button-link">Create a customer account</a>
 <a href="/restaurant_login" class="button-link">Buisness Login</a>
 {% endblock %}
     {% with messages = get_flashed_messages() %}
@@ -51,5 +51,5 @@
             <img src="{{ url_for('static', filename='images/restaurant_register.png') }}" alt="restaurant Registration Image" class="restaurant-registration-image">
         </div>
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
+       
     {% endblock %}

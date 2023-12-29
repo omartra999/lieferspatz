@@ -6,11 +6,11 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="flashes-container"> 
-                {% for msg in messages %}
-                    <p>{{ msg }}</p>
-                {% endfor %}
-            </div>
+        <div class="flashes-container"> 
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
         {% endif %}
     {% endwith %}
     <div class="form-containerCL">
@@ -27,5 +27,4 @@
             <input type="submit" value="LOGIN" class="register-button">
         </form>
         </div>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
 {% endblock %}

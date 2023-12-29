@@ -4,27 +4,27 @@
     <h2>Manage PLZ</h2>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <div class="flashes-container"> 
-                {% for msg in messages %}
-                    <p>{{ msg }}</p>
-                {% endfor %}
-            </div>
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('manage_plz') }}" class="form-group" method="POST">
+    <form action="/add_postal" class="form-group" method="POST">
         <label for="plz">PLZ:</label>
-        <input type="text" name="plz" id="plz" required>
-        <button type="submit" name="action" value="add_plz_to_list">Add PLZ</button>
+        <input type="number" name="del_plz" id="del_plz" required>
+        <button type="submit" name="action" value="add_postal">Add PLZ</button>
     </form>
-    <form action="{{ url_for('manage_plz') }}" method="POST">
-        <button type="submit" name="action" value="submit_plz_list">Submit</button>
+    <form action="/add_postal" method="POST">
+        <button type="submit" name="action" value="submit_postals">Submit</button>
     </form>
-    <h4>Current PLZ List:</h4>
+    <h4>added areas:</h4>
     <ul>
         {% for plz in plz_list %}
             <li>{{ plz }}</li>
         {% endfor %}
     </ul>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
+    {% if show_skip %}
+    <a href="/restaurant_home" class="button-link">skip to profile overview</a>
+    {% endif %}
 {% endblock %}
