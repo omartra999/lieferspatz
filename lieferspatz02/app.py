@@ -6,7 +6,7 @@ from LoginManager import loginManager
 from TimeManager import timeManager
 from Restaurant import _restaurant
 from PlzManager import plzManager
-from RestaurantLogo import logo
+from Restaurant import logo
 from datetime import datetime
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
