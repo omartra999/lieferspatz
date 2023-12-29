@@ -148,8 +148,7 @@ def login():
         password = request.form["password"]
 
         ##id check
-        login = login_manager.loginCustomer(username, password)
-        if login:##success
+        if login_manager.loginCustomer(username, password):
             session["username"] = username
             session["logged_in"] = True
             flash("login successfuly")
