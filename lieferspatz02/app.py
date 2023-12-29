@@ -564,6 +564,11 @@ def add_items():
     else:
         return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
 
+@app.route("/cart")
+@login_required_customer
+def cart():
+        return render_template("cart.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
