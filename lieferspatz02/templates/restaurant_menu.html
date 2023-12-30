@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Menu{% endblock %}
+{% block button %}
+    <form action="/logout_customer" method="POST">
+        <input type="submit" value="Logout" class="button-link">
+    </form>
+{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h1>Welcome to the Menu of {{ restaurants[1] }}</h1>
+
+    <h2>Description: {{ restaurants[4] }}</h2>
+
+    <h2>Restaurant Name: {{ restaurants[1] }}</h2>
+    <p>Address: {{ restaurants[2] }}, {{ restaurants[3] }}</p>
+
+    {% if menus %}
+        <h3>Menu</h3>
+        {% for menu in menus %}
+            <div class="menu-item">
+                <div class="bordered-box">
+                    <h4>{{ menu[1] }}</h4>
+                    <p>Price: {{ menu[2] }}</p>
+                    <p>Detail: {{ menu[3] }}</p>
+                    <p>Type: {{ menu[4] }}</p>
+                </div>
+                <div class="add-to-cart-button">
+                    <form action="/add_to_cart" method="POST">
+                        <input type="hidden" name="menu_item_id" value="{{ menu[0] }}">
+                        <input type="submit" value="Add to Cart" class="button">
+                    </form>
+                </div>
+                <div style="clear:both;"></div> <!-- Clear the float -->
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No menu items available.</p>
+    {% endif %}
+</body>
+
+<style>
+    /* Updated styles for the bordered box with off-white color */
+    .bordered-box {
+        border: 2px solid #f8f8f8;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f8f8f8; /* Background color for better visibility */
+        margin-bottom: 10px;
+        float: left;
+    }
+
+    /* Styles for the Add to Cart button */
+    .add-to-cart-button {
+        float: right;
+        margin-top: 10px;
+    }
+
+    /* Clear float for proper alignment */
+    .menu-item {
+        overflow: auto;
+    }
+
+    /* Basic button styles */
+    .button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+</style>
+
+</html>
+{% endblock %}
+
+<!--- For reference
+restaurant[0] = id
+restaurant[1] = name 
+restaurant[2] = address
+restaurant[3] = plz
+restaurant[4] = description
+
+menu [0] = restaurant_id, 
+menu [1] =  item_name, 
+menu [2] =  price, 
+menu [3] =  detail, 
+menu [4] =  type 
+-->
