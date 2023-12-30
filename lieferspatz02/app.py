@@ -402,39 +402,6 @@ def set_opening_times():
 
 
 
-@app.route("/home")
-@login_required_customer
-def home():
-        if "username" in session: ## login success
-            conn = sqlite3.connect(connection)
-            cursor = conn.cursor()
-        ##retrieveing data
-            cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
-            restaurants = cursor.fetchall()
-            cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
-            openning_times = cursor.fetchall()
-
-            cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
-            menu = cursor.fetchall()
-            conn.close()
-
-        # Get the current day and time
-            current_day = datetime.now().strftime("%A")
-            current_time = datetime.now().strftime("%H:%M")
-        # Filter out restaurants that are not open at the current time
-            open_restaurants = []
-            for restaurant in restaurants:
-                for time in openning_times:
-                    if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
-                        if time[2] <= current_time <= time[3]:
-                            open_restaurants.append(restaurant)
-                            break
-
-        ##Link home.html and all the restaurant  
-            return render_template("home.html",restaurants=open_restaurants,openning_times=openning_times,menus=menu)    
-        else: ## login failed
-            return redirect(url_for("login"))
-
 @app.route("/edit_menu", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_menu():
@@ -622,6 +589,76 @@ def add_logo():
             else:
                 flash("Error occurred while adding the logo")
     return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
+
+@app.route("/home", methods=["GET", "POST"])
+@login_required_customer
+def home():
+    if request.method == "GET":
+        if "username" in session:  # login success
+            conn = sqlite3.connect(connection)
+            cursor = conn.cursor()
+            # retrieving data
+            cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
+            restaurants = cursor.fetchall()
+            cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
+            openning_times = cursor.fetchall()
+
+            cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
+            menu = cursor.fetchall()
+            conn.close()
+
+            # Get the current day and time
+            current_day = datetime.now().strftime("%A")
+            current_time = datetime.now().strftime("%H:%M")
+            # Filter out restaurants that are not open at the current time
+            open_restaurants = []
+            for restaurant in restaurants:
+                for time in openning_times:
+                    if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
+                        if time[2] <= current_time <= time[3]:
+                            open_restaurants.append(restaurant)
+                            break
+
+            # Link home.html and all the restaurant
+            return render_template("home.html", restaurants=open_restaurants, openning_times=openning_times, menus=menu)
+        else:  # login failed
+            return redirect(url_for("login"))
+    elif request.method == "POST":
+        # Handle POST request, e.g., form submission
+        restaurant_id = request.form.get("restaurant_id")
+        if restaurant_id:
+            # Redirect to the restaurant_menu page with the selected restaurant_id
+            return redirect(url_for("restaurant_menu", restaurant_id=restaurant_id))
+        else:
+            # Handle the case where restaurant_id is not provided
+            flash("Invalid request. Please try again.")
+            return redirect(url_for("home"))
+
+        
+
+
+@app.route("/restaurant_menu", methods=["POST", "GET"])
+@login_required_customer
+def restaurant_menu():
+    
+    if request.method == "POST":
+        restaurant_id = request.form.get("restaurant_id")
+        conn = sqlite3.connect(connection)  # Replace with your actual database file
+        cursor = conn.cursor()
+        
+
+        # Fetch restaurant information based on the provided restaurant_id
+        cursor.execute("SELECT id, restaurantname, address, plz, description FROM restaurant WHERE id = ?", (restaurant_id,))
+        selected_restaurant = cursor.fetchone()
+
+        cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
+        restaurantMenu = cursor.fetchall()
+        conn.close()
+        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=restaurantMenu)
+    else:  # login failed
+            return redirect(url_for("login"))
+        
+
 
 if __name__ == "__main__":
     app.run(debug=True)
