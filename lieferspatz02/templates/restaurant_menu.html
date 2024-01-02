@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Menu{% endblock %}
 {% block button %}
-    <a href="/cart" class="button-link">Cart</a>
+    <a href="/add_to_cart" class="button-link">Cart</a>
     <form action="/logout_customer" method="POST">
         <input type="submit" value="Logout" class="button-link">
     </form>
@@ -32,23 +32,52 @@
                     <p>Type: {{ menu[4] }}</p>
                 </div>
                 <div class="add-to-cart-button">
-                    <form action="/add_to_cart" method="POST">
-                        <input type="hidden" name="menu_item_id" value="{{ menu[0] }}">
-                        <input type="hidden" name="item_name" value="{{ menu[1] }}">
-                        <input type="hidden" name="price" value="{{ menu[2] }}">
-                        <input type="hidden" name="detail" value="{{ menu[3] }}">
-                        <input type="hidden" name="type" value="{{ menu[4] }}">
-                        <input type="submit" value="Add to Cart" class="button">
+                    <form class="add-to-cart-form">
+                        <input type="hidden" name="item_id" value="{{ menu[0] }}">
+                        <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
                         <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                        <input type="hidden" name="price" value="{{ menu[2] }}">
+                        <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
+                        <input type="hidden" name="item_name" value="{{ menu[1] }}">
+                        <input type="button" value="Add to Cart" class="button add-to-cart-btn">
                     </form>
                 </div>
                 <div style="clear:both;"></div> <!-- Clear the float -->
             </div>
         {% endfor %}
+        
     {% else %}
         <p>No menu items available.</p>
     {% endif %}
 </body>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $(".add-to-cart-btn").click(function () {
+            var form = $(this).closest(".add-to-cart-form");
+
+            // Serialize the form data
+            var formData = form.serialize();
+
+            // AJAX request to add item to the cart
+            $.ajax({
+                url: "/add_to_cart",
+                type: "POST",
+                data: formData,
+                success: function (response) {
+                    // Handle success, if needed
+                    alert(response.message); // Display a message or perform other actions
+                },
+                error: function (error) {
+                    // Handle error, if needed
+                    console.error("Error adding to cart:", error);
+                }
+            });
+        });
+    });
+</script>
 
 <style>
     /* Updated styles for the bordered box with off-white color */
@@ -84,22 +113,7 @@
         cursor: pointer;
         border-radius: 5px;
     }
-
 </style>
 
 </html>
 {% endblock %}
-
-<!--- For reference
-restaurant[0] = id
-restaurant[1] = name 
-restaurant[2] = address
-restaurant[3] = plz
-restaurant[4] = description
-
-menu [0] = restaurant_id, 
-menu [1] =  item_name, 
-menu [2] =  price, 
-menu [3] =  detail, 
-menu [4] =  type 
--->
