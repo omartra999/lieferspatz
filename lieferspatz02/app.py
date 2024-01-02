@@ -1,12 +1,11 @@
 import json
-from flask import Flask, redirect, url_for, render_template, request,session, flash
+from flask import Flask, jsonify, redirect, url_for, render_template, request,session, flash
 from werkzeug.datastructures import MultiDict
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
 from TimeManager import timeManager
 from Restaurant import _restaurant
 from PlzManager import plzManager
-from Restaurant import logo
 from datetime import datetime
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
@@ -16,7 +15,7 @@ import os
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz.db"
+connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -147,13 +146,16 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        
 
         ##id check
         login = login_manager.loginCustomer(username, password)
-        if login:##success
+        if login > 0:##success
+            session["user_id"] = login
             session["username"] = username
             session["logged_in"] = True
             flash("login successfuly")
+            print(session)
             return redirect(url_for("home"))
         
         else:##failed
@@ -174,8 +176,8 @@ def restaurant_login():
         password = request.form["password"]
 
         ##id check
-        login=login_manager.loginRestaurant(username, password)
-        if login:
+        login = login_manager.loginRestaurant(username, password)
+        if login:##success
             session["logged_in_restaurant"] = True
             session["username"] = username
             restaurant_name = login[2]
@@ -190,7 +192,6 @@ def restaurant_login():
             session["email"] = email
             description = login[7]
             session["description"] = description
-            
             flash("login successfuly")
             return redirect(url_for('restaurant_home')) 
         
@@ -218,10 +219,8 @@ def restaurant_home():
 
         menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
-        print(delivery_range)
 
         opening_times = time_manager.get_openning_times(restaurant_id)
-
         # Combine variables into a single dictionary
         template_data = {
         "restaurantName": restaurant_name,
@@ -237,7 +236,7 @@ def restaurant_home():
         "openTimes": opening_times
         # Add more variables as needed
         }
-   
+
         return render_template("restaurant_home.html", **template_data)
     else:
         return redirect(url_for('restaurant_login'))
@@ -350,6 +349,7 @@ def add_opening_time():
             return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form, show_skip = True)
     else:
         return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form, show_skip = True)
+
 @app.route("/edit_opening_times", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_opening_times():
@@ -402,6 +402,7 @@ def set_opening_times():
 
 
 
+
 @app.route("/edit_menu", methods = ["POST","GET"])
 @login_required_restaurant
 def edit_menu():
@@ -431,6 +432,7 @@ def delete_items():
 
     items = restaurant.getMenu()  # Fetch menu items for display
     return render_template("delete_items.html", items=items)
+
 @app.route("/delete_area", methods = ["POST", "GET"])
 @login_required_restaurant
 def delete_area():
@@ -444,6 +446,7 @@ def delete_area():
         else:
             flash("an error accured")
         return redirect(url_for("restaurant_home"))
+    
 ##manage_plz omar version with no json, no list, single entries
 @app.route('/add_postal', methods = ["POST","GET"])
 @login_required_restaurant
@@ -524,6 +527,8 @@ def manage_plz():
     else:
         return render_template('manage_plz.html')
 
+
+
 @app.route("/add_items", methods = ["POST", "GET"])
 @login_required_restaurant
 def add_items():
@@ -544,57 +549,21 @@ def add_items():
             flash("item added successfuly")
             return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items, range = restaurant.get_delivery_raduis())
         else:
-            flash("Items are not added some Error accured")
+            flash("Items are not added some Error occured")
             return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
     else:
         return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
 
-@app.route("/cart")
-@login_required_customer
-def cart():
-        return render_template("cart.html")
 
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Define the allowed file extensions for logos
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-@app.route("/add_logo", methods=["POST", "GET"])
-@login_required_restaurant
-def add_logo():
-
-    restaurant_id = session.get('restaurant_id')
-    logo_manager = logo(connection)
-
-    if request.method == "POST":
-        ##this checks if the uploaded image has the word 'logo' in it so we're sure it's the correct file 
-        if 'logo' not in request.files:
-            flash('No file part')
-            return render_template("restaurant_home.html")
-        
-        logo_ = request.files['logo']
-
-        # If the user does not select a file, the browser submits an empty file without a filename
-        if logo_.filename == '':
-            flash('No selected file')
-            return render_template("restaurant_home.html")
-
-        if logo_ and allowed_file(logo_.filename):
-            add = logo_manager.updateRestaurantImage(restaurant_id,logo_)
-            if add:
-                flash("Logo added successfully")
-            else:
-                flash("Error occurred while adding the logo")
-    return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
 
 @app.route("/home", methods=["GET", "POST"])
 @login_required_customer
 def home():
+    
     if request.method == "GET":
-        if "username" in session:  # login success
+        
+        if "username" in session and "user_id" in session:  # login success
+           
             conn = sqlite3.connect(connection)
             cursor = conn.cursor()
             # retrieving data
@@ -620,7 +589,7 @@ def home():
                             break
 
             # Link home.html and all the restaurant
-            return render_template("home.html", restaurants=open_restaurants, openning_times=openning_times, menus=menu)
+            return render_template("home.html", restaurants=open_restaurants, openning_times=openning_times, menus=menu, customer_id=session.get("user_id"))
         else:  # login failed
             return redirect(url_for("login"))
     elif request.method == "POST":
@@ -634,8 +603,6 @@ def home():
             flash("Invalid request. Please try again.")
             return redirect(url_for("home"))
 
-        
-
 
 @app.route("/restaurant_menu", methods=["POST", "GET"])
 @login_required_customer
@@ -643,6 +610,7 @@ def restaurant_menu():
     
     if request.method == "POST":
         restaurant_id = request.form.get("restaurant_id")
+        customer_id = request.form.get("customer_id")
         conn = sqlite3.connect(connection)  # Replace with your actual database file
         cursor = conn.cursor()
         
@@ -653,13 +621,113 @@ def restaurant_menu():
 
         cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
         restaurantMenu = cursor.fetchall()
+
         conn.close()
-        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=restaurantMenu)
+        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=restaurantMenu, customer_id=customer_id)
     else:  # login failed
             return redirect(url_for("login"))
         
+ 
+
+@app.route("/delivery_timer")
+def delivery_timer():
+        return render_template("delivery_timer.html")
+
+## this one is for adding items to cart
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    # Get item data from the AJAX request
+    item_id = request.form.get('item_id')
+    item_name = request.form.get('item_name')
+    price = request.form.get('price')
+    restaurant_name = request.form.get('restaurant_name')
+    restaurant_id = request.form.get('restaurant_id')
+
+    # Process the item data as needed (store it in the session or database)
+    # For demonstration purposes, lets store it in the session
+    cart_items = session.get('cart_items', [])
+    cart_items.append({
+        'item_id': item_id,
+        'restaurant_id' : restaurant_id,
+        'customer_id': session.get('user_id'),
+        'quantity' : 1,
+        'time': str(datetime.now().time().strftime('%H:%M')),
+        'date': str(datetime.now().date()),
+        'status' : 'open',
+        'description' : ' ',
+        'item_name' : item_name,
+        'price' : price,
+        
+        })
+    session['cart_items'] = cart_items
+    # Return a response 
+    return jsonify({'message': f'Item "{item_name}" added to the cart successfully!'})
+
+
+## this one is for viewing the cart
+@app.route("/add_to_cart", methods=["GET"])
+def view_cart():
+    # Retrieve items from session
+    cart_items = session.get("cart_items", [])
+
+
+    # Print session to the console check here
+    ##print(cart_items)
+    
+    # Pass the items to the HTML template
+    return render_template("add_to_cart.html", cart_items=cart_items)
+
+
+@app.route('/clear_cart', methods=['POST'])
+def clear_cart():
+    session.pop('cart_items', None)  # Remove the 'cart_items' key from the session
+    flash('Cart cleared successfully', 'success')
+    return redirect(url_for('view_cart'))
+
+
+@app.route('/submit_order', methods=['POST'])
+def submit_order():
+    print("reached submit order")
+    # Retrieve items from session
+    cart_items = session.get('cart_items', [])
+    
+    try:
+        conn = sqlite3.connect(connection)
+        cursor = conn.cursor()
+        
+        for x in cart_items:
+            # Writing data
+            order_query = "INSERT INTO Orders (item_id, restaurant_id, customer_id, quantity, time, date, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            parameters_order = (
+                x['item_id'],
+                x['restaurant_id'],
+                x['customer_id'],
+                x['quantity'],
+                x['time'],
+                x['date'],
+                x['status'],
+                x['description'],
+            )
+
+            cursor.execute(order_query, parameters_order)
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"SQLite error: {e}")
+        conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+
+    # Clear the cart after processing the items
+    session.pop('cart_items', None)
+
+    # Redirect to the home page after processing the order
+    return redirect(url_for('home'))
+
 
 
 if __name__ == "__main__":
     app.run(debug=True)
     print("current directory:", currentDirectory)
+
