@@ -238,18 +238,24 @@ class _restaurant:
             return False
 
     def add_plz(self, plz_list):
+        if isinstance(self.id, int) == False:
+            restaurant_id = self.id[1]
+        else:
+            restaurant_id = self.id
         try:
             with self.connection:
                 query = "INSERT INTO postal(restaurant_id, plz) VALUES (?, ?)"
                 for plz in plz_list:
                     print("list: ", plz_list)
                     if self.plz_exists(plz) == False:
-                        self.cursor.execute(query, (self.id, plz,))
+                        self.cursor.execute(query, (restaurant_id, plz,))
             self.connection.commit()
             return True
         except Exception as e:
+            print("restaurant id: ", self.id)
             print(f"an error accured: {e}")
             return False
+        
         
     def delete_plz(self, plz):
         try: 
