@@ -115,7 +115,7 @@ def restaurant_register():
         ##registering and retrive restaurant id from the database
         elif restaurant_id is not None:
                 #store the id
-                session["restaurant_id"] = restaurant_id
+                session["restaurant_id"] = restaurant_id[1]
                 session["logged_in_restaurant"] = True
                 return redirect(url_for('add_opening_time',))
     
