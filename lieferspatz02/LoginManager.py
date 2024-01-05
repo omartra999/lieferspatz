@@ -9,7 +9,8 @@ class loginManager:
         customer_query = "SELECT COUNT(*) FROM customer WHERE username = ? AND password = ?"
         with self.connection:
             result = self.cursor.execute(customer_query, (username, password,)).fetchone()[0]
-            return result > 0 , username 
+            return result 
+
     def loginRestaurant(self, username, password):
         restarant_query = "SELECT COUNT(*), restaurantname, id, username, address, plz, email, description FROM restaurant WHERE username = ? AND password = ?"
         with self.connection:

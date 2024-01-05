@@ -199,7 +199,7 @@ class _restaurant:
         try:
             with self.connection:
                 query = "SELECT item_name, detail, price, type FROM menu WHERE restaurant_id = ?"
-                menu = self.cursor.execute(query,(self.id,)).fetchall()
+                menu = self.cursor.execute(query,(self.id,))
                 return menu
         except Exception as e:
             print(f"an error accured: {e}")
@@ -238,24 +238,18 @@ class _restaurant:
             return False
 
     def add_plz(self, plz_list):
-        if isinstance(self.id, int) == False:
-            restaurant_id = self.id[1]
-        else:
-            restaurant_id = self.id
         try:
             with self.connection:
                 query = "INSERT INTO postal(restaurant_id, plz) VALUES (?, ?)"
                 for plz in plz_list:
                     print("list: ", plz_list)
                     if self.plz_exists(plz) == False:
-                        self.cursor.execute(query, (restaurant_id, plz,))
+                        self.cursor.execute(query, (self.id, plz,))
             self.connection.commit()
             return True
         except Exception as e:
-            print("restaurant id: ", self.id)
             print(f"an error accured: {e}")
             return False
-        
         
     def delete_plz(self, plz):
         try: 
@@ -319,34 +313,3 @@ class _restaurant:
         except Exception as e:
             print(f"an error accured: {e}")
             return False
-        
-class logo:
-    def __init__(self, connection):
-        self.connection = sqlite3.connect(connection)
-
-    @staticmethod
-    def convertToBinaryData(filename):
-        with open(filename, 'rb') as file:
-            blobData = file.read()
-        return blobData
-
-    def updateRestaurantImage(self,id,logo):
-        try:
-            with self.connection:
-
-                query = "UPDATE restaurant SET logo = ? WHERE id = ?"
-
-                newImage = self.convertToBinaryData(logo)
-
-                data_tuple = (newImage, id)
-
-                self.connection.cursor().execute(query, data_tuple)
-                self.connection.commit()
-                return True
-
-        except sqlite3.Error as error:
-            print("Failed to update restaurant image in SQLite table", error)
-            return False
-        finally:
-            if self.connection:
-                self.connection.close()

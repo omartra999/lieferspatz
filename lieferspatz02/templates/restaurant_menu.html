@@ -14,12 +14,12 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <h1>Welcome to the Menu of {{ restaurants[1] }} {{ customer_id }}</h1>
+    <h1>Welcome to the Menu of {{ restaurants[2] }} {{ customer_id }}</h1>
 
-    <h2>Description: {{ restaurants[4] }}</h2>
+    <h2>Description: {{ restaurants[5] }}</h2>
 
-    <h2>Restaurant Name: {{ restaurants[1] }}</h2>
-    <p>Address: {{ restaurants[2] }}, {{ restaurants[3] }}</p>
+    <h2>Restaurant Name: {{ restaurants[2] }}</h2>
+    <p>Address: {{ restaurants[3] }}, {{ restaurants[4] }}</p>
 
     {% if menus %}
         <h3>Menu</h3>
@@ -33,12 +33,12 @@
                 </div>
                 <div class="add-to-cart-button">
                     <form class="add-to-cart-form">
-                        <input type="hidden" name="menu_item_id" value="{{ menu[0] }}">
-                        <input type="hidden" name="item_name" value="{{ menu[1] }}">
-                        <input type="hidden" name="price" value="{{ menu[2] }}">
-                        <input type="hidden" name="detail" value="{{ menu[3] }}">
-                        <input type="hidden" name="type" value="{{ menu[4] }}">
+                        <input type="hidden" name="item_id" value="{{ menu[0] }}">
+                        <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
                         <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                        <input type="hidden" name="price" value="{{ menu[2] }}">
+                        <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
+                        <input type="hidden" name="item_name" value="{{ menu[1] }}">
                         <input type="button" value="Add to Cart" class="button add-to-cart-btn">
                     </form>
                 </div>

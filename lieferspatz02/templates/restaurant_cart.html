@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Add to Cart{% endblock %}
+{% block button %}
+    <a href="/restaurant_home" class="button-link">Return to home</a>
+    <form action="{{url_for('order_cart.history') }} " method="GET">
+        <input type="hidden" name="user_type" value="customer">
+        <input type="submit" value="History" class="button-link">
+    </form>
+    <form action="/logout_restaurant" method="POST">
+        <input type="submit" value="Logout" class="button-link">
+    </form>
+    
+{% endblock %}
+{% block content %}
+    <h1>Your awaiting Order</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if all_open_order %}
+        <ul>
+            {% for order in all_open_order %}
+                <li>
+                    {{ order[1] }} - customer: {{ order[3] }} - Status: {{ order[6]}}
+                    <form action="{{ url_for('order_cart.edit_status') }}" method="POST">
+                        <input type="hidden" name="order_id" value="{{ order[0] }}">
+                        <input type="hidden" name="param_name" value="accepted">
+                        <input type="submit" value="Accept">
+                    </form>
+                    <!-- Add more details as needed -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no customer.</p>
+    {% endif %}
+
+    <h1>Accepted Order</h1>
+    {% if all_accepted_order %}
+        <ul>
+            {% for order in all_accepted_order %}
+                <li>
+                    {{ order[1] }} - restaurant: {{ order[2] }} - Status: {{ order[6]}}
+                    <!-- Add more details as needed -->
+                    <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                        <input type="hidden" name="order_id" value="{{ order[0] }}">
+                        <select name="status">
+                            <option value="preparing">Preparing</option>
+                            <option value="delivering">Delivering</option>
+                            <option value="accepted">Accepted</option>
+                            <!-- Add more status options as needed -->
+                        </select>
+                        <input type="submit" value="Update Status">
+                    </form>
+                    <!-- Add more details as needed -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no Order.</p>
+    {% endif %}
+
+{% endblock %}

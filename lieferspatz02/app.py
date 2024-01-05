@@ -9,13 +9,16 @@ from PlzManager import plzManager
 from datetime import datetime
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
-
+from order_cart_blueprint import order_cart
+from functions import f
 import os
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
 connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+app.register_blueprint(order_cart, url_prefix='/order_cart')
+
 
 @app.route("/", methods = ["POST", "GET"])
 def role():
@@ -115,7 +118,7 @@ def restaurant_register():
         ##registering and retrive restaurant id from the database
         elif restaurant_id is not None:
                 #store the id
-                session["restaurant_id"] = restaurant_id[1]
+                session["restaurant_id"] = restaurant_id
                 session["logged_in_restaurant"] = True
                 return redirect(url_for('add_opening_time',))
     
@@ -210,12 +213,6 @@ def restaurant_home():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     if ('restaurant_name') in session and ('restaurant_id') in session:
-        restaurant_name = session['restaurant_name']
-        address = session['address']
-        plz = session['plz']
-        email = session['email']
-        description = session['description']
-        username = session['username']
 
         menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
@@ -223,12 +220,12 @@ def restaurant_home():
         opening_times = time_manager.get_openning_times(restaurant_id)
         # Combine variables into a single dictionary
         template_data = {
-        "restaurantName": restaurant_name,
-        "userName": username,
-        "restaurantAddress": address,
-        "Postal": plz,
-        "mail": email,
-        "des": description,
+        "restaurantName": session['restaurant_name'],
+        "userName": session['username'],
+        "restaurantAddress": session['address'],
+        "Postal": session['plz'],
+        "mail": session['email'],
+        "des": session['description'],
         "should_show_edit_button": True,
         "show_menu_button": True,
         "items": menu,
@@ -236,7 +233,7 @@ def restaurant_home():
         "openTimes": opening_times
         # Add more variables as needed
         }
-
+        print(template_data)
         return render_template("restaurant_home.html", **template_data)
     else:
         return redirect(url_for('restaurant_login'))
@@ -307,8 +304,13 @@ def logout_restaurant():
 @login_required_customer
 def logout_customer():
     if request.method == "POST":
-        session.pop('username',None)
-        return redirect(url_for('login'))
+        print(session)
+        if 'cart_items' in session:
+            flash("Cart is not clear. Please clear before you log out.")
+            return redirect(url_for('add_to_cart'))
+        else:    
+            session.clear()
+            return redirect(url_for('login'))
     
 #add open hours for a restaurant     
 @app.route("/add_opening_time", methods = ["POST","GET"])
@@ -564,14 +566,15 @@ def home():
         
         if "username" in session and "user_id" in session:  # login success
            
+
             conn = sqlite3.connect(connection)
             cursor = conn.cursor()
+
             # retrieving data
             cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
             restaurants = cursor.fetchall()
             cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
             openning_times = cursor.fetchall()
-
             cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
             menu = cursor.fetchall()
             conn.close()
@@ -616,8 +619,7 @@ def restaurant_menu():
         
 
         # Fetch restaurant information based on the provided restaurant_id
-        cursor.execute("SELECT id, restaurantname, address, plz, description FROM restaurant WHERE id = ?", (restaurant_id,))
-        selected_restaurant = cursor.fetchone()
+        selected_restaurant = f.get_information(restaurant_id,'restaurant')
 
         cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
         restaurantMenu = cursor.fetchall()
@@ -667,21 +669,47 @@ def add_to_cart():
 ## this one is for viewing the cart
 @app.route("/add_to_cart", methods=["GET"])
 def view_cart():
+    print(session)
     # Retrieve items from session
     cart_items = session.get("cart_items", [])
 
-
-    # Print session to the console check here
-    ##print(cart_items)
-    
+    #show customer order
+    conn = sqlite3.connect(connection)
+    cursor = conn.cursor()
+    query =  "SELECT * FROM Orders WHERE customer_id =  ?" 
+    customer_id = session.get('user_id')
+    orders = cursor.execute(query, (customer_id,)).fetchall()
+    all_order = []
+    if orders:
+        for order in orders:
+            template_data = {
+            "menu" : f.get_information(order[1],'menu'),
+            "restaurant": f.get_information(order[2],'restaurant'),
+            "customer": f.get_information(order[3],'customer'),
+            "order" : order
+            }
+            all_order.append(template_data)
+    print(all_order)
     # Pass the items to the HTML template
-    return render_template("add_to_cart.html", cart_items=cart_items)
+    return render_template("add_to_cart.html", cart_items=cart_items,all_order = all_order)
 
 
 @app.route('/clear_cart', methods=['POST'])
 def clear_cart():
     session.pop('cart_items', None)  # Remove the 'cart_items' key from the session
     flash('Cart cleared successfully', 'success')
+    return redirect(url_for('view_cart'))
+
+@app.route('/clear_order', methods=['POST'])
+def clear_order():
+    conn = sqlite3.connect(connection)
+    cursor = conn.cursor()
+    customer_id = session.get("user_id")
+    cursor.execute("DELETE FROM Orders WHERE customer_id = ?", (customer_id,))
+    conn.commit()
+    flash('Order cleared successfully', 'success')
+    cursor.close()
+    conn.close()
     return redirect(url_for('view_cart'))
 
 
@@ -730,4 +758,5 @@ def submit_order():
 if __name__ == "__main__":
     app.run(debug=True)
     print("current directory:", currentDirectory)
+
 
