@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Add to Cart{% endblock %}
 {% block button %}
-    <a href="/home" class="button-link">Return to home</a>
+    <a href="/home" class="button-link">Return to Home</a>
     <form action="/logout_customer" method="POST">
         <input type="submit" value="Logout" class="button-link">
     </form>
@@ -20,12 +20,32 @@
                     <!-- Add more details as needed -->
                 </li>
             {% endfor %}
-            <form action="/submit_order" method="POST">
-                <input type="submit" value="Submit" class="button-link">
-            </form>
         </ul>
+        <form>
+            <button id="submitOrderBtn" class="button">Submit Order</button>
+        </form>   
     {% else %}
         <p>Your cart is empty.</p>
     {% endif %}
 
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#submitOrderBtn").click(function () {
+                // AJAX request to submit the order
+                $.ajax({
+                    url: "/submit_order",
+                    type: "POST",
+                    success: function (response) {
+                        alert(response.message); // Display a message or perform other actions
+                        window.location.href = "/restaurant_menu";  // Redirect to the restaurant_menu page
+                    },
+                    error: function (error) {
+                        console.error("Error submitting order:", error);
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

@@ -33,28 +33,14 @@
                                     </li>
                                 {% endif %}
                             {% endfor %}
+                            
+                            <form action="{{ url_for('restaurant_menu') }}" method="post">
+                                <input type="hidden" name="restaurant_id" value="{{ restaurant[0] }}">
+                                <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                                <button type="submit">Click Here! to Order</button>
+                            </form>
 
-                            <!-- "See More/See Less" button and hidden menu information -->
-                            <li>
-                                <button class="see-more-btn">See More</button>
-                                <button class="see-less-btn" style="display: none;">See Less</button>
-                                <div class="menu-info" style="display: none;">
-                                    {% set count = namespace(value=0) %}   
-                                        {% for menu in menus %}
-
-                                            {% if menu[0] == restaurant[0] %}
-                                            {% set count.value = count.value + 1 %}
-                                                <!-- Updated class to add a border with off-white color -->
-                                                <div class="bordered-box">
-                                                    <p>Item Number: {{ count.value }}</p>
-                                                    <p>ITEM NAME : {{ menu[1] }}</p>
-                                                    <p>ITEM PRICE : {{ menu[2] }} EUR</p>
-                                                    <p>ITEM DESCRIPTION : {{ menu[3] }}</p>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                </div>
-                            </li>
+                           
                         </ul>
                     </li>
                 {% endfor %}
@@ -64,45 +50,5 @@
         {% endif %}
     </body>
 
-    <style>
-        /* Updated styles for the bordered box with off-white color */
-        .bordered-box {
-            border: 2px solid #f8f8f8; 
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #f8f8f8; /* Background color for better visibility */
-        }
-    </style>
-
-    <script>
-        // JavaScript to toggle the visibility of menu information and change button text
-        document.querySelectorAll('.see-more-btn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var menuInfo = this.nextElementSibling.nextElementSibling; // Get the menu information div
-                var seeLessBtn = this.nextElementSibling; // Get the See Less button
-
-                // Toggle the visibility of menu information
-                menuInfo.style.display = (menuInfo.style.display === 'none' || menuInfo.style.display === '') ? 'block' : 'none';
-
-                // Toggle the visibility of "See More" and "See Less" buttons
-                this.style.display = 'none';
-                seeLessBtn.style.display = 'inline-block';
-            });
-        });
-
-        // JavaScript to toggle the visibility of menu information and change button text
-        document.querySelectorAll('.see-less-btn').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var menuInfo = this.nextElementSibling; // Get the menu information div
-                var seeMoreBtn = this.previousElementSibling; // Get the See More button
-
-                // Toggle the visibility of menu information
-                menuInfo.style.display = 'none';
-
-                // Toggle the visibility of "See More" and "See Less" buttons
-                this.style.display = 'none';
-                seeMoreBtn.style.display = 'inline-block';
-            });
-        });
-    </script>
+   
 {% endblock %}
