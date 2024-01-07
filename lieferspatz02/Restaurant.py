@@ -199,7 +199,7 @@ class _restaurant:
         try:
             with self.connection:
                 query = "SELECT item_name, detail, price, type FROM menu WHERE restaurant_id = ?"
-                menu = self.cursor.execute(query,(self.id,)).fetchall()
+                menu = self.cursor.execute(query,(self.id,))
                 return menu
         except Exception as e:
             print(f"an error accured: {e}")

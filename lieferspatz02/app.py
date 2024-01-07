@@ -307,7 +307,7 @@ def logout_customer():
         print(session)
         if 'cart_items' in session:
             flash("Cart is not clear. Please clear before you log out.")
-            return redirect(url_for('add_to_cart'))
+            return redirect(url_for('order_cart.view_cart'))
         else:    
             session.clear()
             return redirect(url_for('login'))
@@ -635,123 +635,8 @@ def restaurant_menu():
 def delivery_timer():
         return render_template("delivery_timer.html")
 
-## this one is for adding items to cart
-@app.route('/add_to_cart', methods=['POST'])
-def add_to_cart():
-    # Get item data from the AJAX request
-    item_id = request.form.get('item_id')
-    item_name = request.form.get('item_name')
-    price = request.form.get('price')
-    restaurant_name = request.form.get('restaurant_name')
-    restaurant_id = request.form.get('restaurant_id')
-
-    # Process the item data as needed (store it in the session or database)
-    # For demonstration purposes, lets store it in the session
-    cart_items = session.get('cart_items', [])
-    cart_items.append({
-        'item_id': item_id,
-        'restaurant_id' : restaurant_id,
-        'customer_id': session.get('user_id'),
-        'quantity' : 1,
-        'time': str(datetime.now().time().strftime('%H:%M')),
-        'date': str(datetime.now().date()),
-        'status' : 'open',
-        'description' : ' ',
-        'item_name' : item_name,
-        'price' : price,
-        
-        })
-    session['cart_items'] = cart_items
-    # Return a response 
-    return jsonify({'message': f'Item "{item_name}" added to the cart successfully!'})
 
 
-## this one is for viewing the cart
-@app.route("/add_to_cart", methods=["GET"])
-def view_cart():
-    print(session)
-    # Retrieve items from session
-    cart_items = session.get("cart_items", [])
-
-    #show customer order
-    conn = sqlite3.connect(connection)
-    cursor = conn.cursor()
-    query =  "SELECT * FROM Orders WHERE customer_id =  ?" 
-    customer_id = session.get('user_id')
-    orders = cursor.execute(query, (customer_id,)).fetchall()
-    all_order = []
-    if orders:
-        for order in orders:
-            template_data = {
-            "menu" : f.get_information(order[1],'menu'),
-            "restaurant": f.get_information(order[2],'restaurant'),
-            "customer": f.get_information(order[3],'customer'),
-            "order" : order
-            }
-            all_order.append(template_data)
-    print(all_order)
-    # Pass the items to the HTML template
-    return render_template("add_to_cart.html", cart_items=cart_items,all_order = all_order)
-
-
-@app.route('/clear_cart', methods=['POST'])
-def clear_cart():
-    session.pop('cart_items', None)  # Remove the 'cart_items' key from the session
-    flash('Cart cleared successfully', 'success')
-    return redirect(url_for('view_cart'))
-
-@app.route('/clear_order', methods=['POST'])
-def clear_order():
-    conn = sqlite3.connect(connection)
-    cursor = conn.cursor()
-    customer_id = session.get("user_id")
-    cursor.execute("DELETE FROM Orders WHERE customer_id = ?", (customer_id,))
-    conn.commit()
-    flash('Order cleared successfully', 'success')
-    cursor.close()
-    conn.close()
-    return redirect(url_for('view_cart'))
-
-
-@app.route('/submit_order', methods=['POST'])
-def submit_order():
-    print("reached submit order")
-    # Retrieve items from session
-    cart_items = session.get('cart_items', [])
-    
-    try:
-        conn = sqlite3.connect(connection)
-        cursor = conn.cursor()
-        
-        for x in cart_items:
-            # Writing data
-            order_query = "INSERT INTO Orders (item_id, restaurant_id, customer_id, quantity, time, date, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-            parameters_order = (
-                x['item_id'],
-                x['restaurant_id'],
-                x['customer_id'],
-                x['quantity'],
-                x['time'],
-                x['date'],
-                x['status'],
-                x['description'],
-            )
-
-            cursor.execute(order_query, parameters_order)
-
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"SQLite error: {e}")
-        conn.rollback()
-    finally:
-        if conn:
-            conn.close()
-
-    # Clear the cart after processing the items
-    session.pop('cart_items', None)
-
-    # Redirect to the home page after processing the order
-    return redirect(url_for('home'))
 
 
 
