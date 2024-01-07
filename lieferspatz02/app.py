@@ -621,7 +621,7 @@ def restaurant_menu():
         # Fetch restaurant information based on the provided restaurant_id
         selected_restaurant = f.get_information(restaurant_id,'restaurant')
 
-        cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
+        cursor.execute("SELECT * FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
         restaurantMenu = cursor.fetchall()
 
         conn.close()
