@@ -459,10 +459,15 @@ def add_postal():
     if request.method == "POST":
         action = request.form.get('action')
         if action == "add_postal":
-            plz = request.form.get('del_plz')
-            if plz not in postals:
-                postals.append(plz)
-                print("added: ", postals)
+            plz = request.form.get('del_plz')      
+            if len(plz) == 5:
+                if plz not in postals:
+                    postals.append(plz)
+                    print("added: ", postals)
+                else:
+                    flash("Postal code already exists!")
+            else:
+                flash("Postal codes must have a length of 5 digits!") 
             session['postals'] = postals
 
             return render_template('manage_plz.html', plz_list = postals)
