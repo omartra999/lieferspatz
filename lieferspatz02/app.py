@@ -183,19 +183,15 @@ def restaurant_login():
         login = login_manager.loginRestaurant(username, password)
         if login:##success
             session["logged_in_restaurant"] = True
-            session["username"] = username
-            restaurant_name = login[2]
-            session["restaurant_name"] = restaurant_name
-            restaurant_id = login[3]
-            session["restaurant_id"] = restaurant_id
-            address = login[4]
-            session["address"] = address
-            plz = login[5]
-            session["plz"] = plz
-            email = login[6]
-            session["email"] = email
-            description = login[7]
-            session["description"] = description
+            ##optimsing may be later
+            session["restaurant_id"] = login[0]
+            session["email"] = login[1]
+            session["username"] = login[2]
+            #password = login[3]
+            session["address"] = login[4]
+            session["plz"] = login[5]
+            session["restaurant_name"] = login[6]
+            session["description"] = login[7]
             flash("login successfuly")
             return redirect(url_for('restaurant_home')) 
         
