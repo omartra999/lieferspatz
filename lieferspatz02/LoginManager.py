@@ -8,7 +8,7 @@ class loginManager:
     def loginCustomer(self, username, password):
         customer_query = "SELECT * FROM customer WHERE username = ? AND password = ?"
         with self.connection:
-            result = self.cursor.execute(customer_query, (username, password,)).fetchone()[0]
+            result = self.cursor.execute(customer_query, (username, password,)).fetchone()
             return result 
 
     def loginRestaurant(self, username, password):
