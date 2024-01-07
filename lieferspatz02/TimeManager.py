@@ -16,8 +16,7 @@ class timeManager:
             return False
 
 
-    def add_openning_times(self, restaurant_id_tuple, days, opens, closes):
-        restaurant_id = restaurant_id_tuple[1]
+    def add_openning_times(self, restaurant_id, days, opens, closes):
         print(f"extracted restaurant id form session : {restaurant_id}")
         try:
             with self.connection:
