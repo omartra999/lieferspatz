@@ -497,45 +497,7 @@ def edit_range():
         return redirect(url_for('edit_range'))
     else:
         return render_template("edit_range.html", range = postals)
-
-##manage_plz kawthar version using json to save plz as a list
-@app.route('/manage_plz',methods = ["POST","GET"])
-@login_required_restaurant
-def manage_plz():
-    restaurant_id = session.get('restaurant_id')
-    plzList = []
-    plz_manager = plzManager(connection)
-    
-    if request.method == 'POST':
-
-        action = request.form.get('action')
-        if action == 'add_plz_to_list':
-            plz_value = request.form.get('plz')
-            # Add the PLZ value to the list in the plz_manager instance
-            plzList.append(plz_value)
-            print("list: ", plzList)
-            flash("PLZ added successfully")
-            return render_template('manage_plz.html')
-
-        elif action == 'submit_plz_list':
-            plz_list_json = json.dumps(plzList)
-            # If the user submitted without entering a PLZ, submit the existing PLZ list
-            success = plz_manager.submit_plz_list(restaurant_id, plz_list_json)
-            if success:
-                flash("PLZ list submitted successfully")
-                session['plzList'] = plzList
-                plzList = []
-                return render_template('manage_plz.html')
-            else:
-                flash("Failed to submit PLZ list")
-                plzList = []
-                return render_template('manage_plz.html')
-            
-    else:
-        return render_template('manage_plz.html')
-
-
-
+  
 @app.route("/add_items", methods = ["POST", "GET"])
 @login_required_restaurant
 def add_items():
