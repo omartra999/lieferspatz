@@ -10,13 +10,13 @@ from datetime import datetime
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
 from order_cart_blueprint import order_cart
-from functions import f
+from functions import f, connection
 import os
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
+connection = "C:\\Users\\User\\Desktop\\Uni\\lieferspatz-main\\lieferspatz02\\Lieferspatz.db"
 app.register_blueprint(order_cart, url_prefix='/order_cart')
 
 
@@ -153,6 +153,7 @@ def login():
 
         ##id check
         login = login_manager.loginCustomer(username, password)
+        print("login:", login)
         if login > 0:##success
             session["user_id"] = login
             session["username"] = username
@@ -459,15 +460,10 @@ def add_postal():
     if request.method == "POST":
         action = request.form.get('action')
         if action == "add_postal":
-            plz = request.form.get('del_plz')      
-            if len(plz) == 5:
-                if plz not in postals:
-                    postals.append(plz)
-                    print("added: ", postals)
-                else:
-                    flash("Postal code already exists!")
-            else:
-                flash("Postal codes must have a length of 5 digits!") 
+            plz = request.form.get('del_plz')
+            if plz not in postals:
+                postals.append(plz)
+                print("added: ", postals)
             session['postals'] = postals
 
             return render_template('manage_plz.html', plz_list = postals)
@@ -497,7 +493,45 @@ def edit_range():
         return redirect(url_for('edit_range'))
     else:
         return render_template("edit_range.html", range = postals)
-  
+
+##manage_plz kawthar version using json to save plz as a list
+@app.route('/manage_plz',methods = ["POST","GET"])
+@login_required_restaurant
+def manage_plz():
+    restaurant_id = session.get('restaurant_id')
+    plzList = []
+    plz_manager = plzManager(connection)
+    
+    if request.method == 'POST':
+
+        action = request.form.get('action')
+        if action == 'add_plz_to_list':
+            plz_value = request.form.get('plz')
+            # Add the PLZ value to the list in the plz_manager instance
+            plzList.append(plz_value)
+            print("list: ", plzList)
+            flash("PLZ added successfully")
+            return render_template('manage_plz.html')
+
+        elif action == 'submit_plz_list':
+            plz_list_json = json.dumps(plzList)
+            # If the user submitted without entering a PLZ, submit the existing PLZ list
+            success = plz_manager.submit_plz_list(restaurant_id, plz_list_json)
+            if success:
+                flash("PLZ list submitted successfully")
+                session['plzList'] = plzList
+                plzList = []
+                return render_template('manage_plz.html')
+            else:
+                flash("Failed to submit PLZ list")
+                plzList = []
+                return render_template('manage_plz.html')
+            
+    else:
+        return render_template('manage_plz.html')
+
+
+
 @app.route("/add_items", methods = ["POST", "GET"])
 @login_required_restaurant
 def add_items():
@@ -580,23 +614,18 @@ def restaurant_menu():
     
     if request.method == "POST":
         restaurant_id = request.form.get("restaurant_id")
-        customer_id = request.form.get("customer_id")
-        conn = sqlite3.connect(connection)  # Replace with your actual database file
-        cursor = conn.cursor()
-        
-
+        customer_id = session.get("user_id")
+        session["customer_id"] = customer_id
+        #restaurant instance to retrieve the menu
+        restaurant = _restaurant(restaurant_id, connection)
+        menu = restaurant.getMenu()
+        selected_restaurant = f.get_information(restaurant_id,'restaurant') 
+        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=menu, customer_id=customer_id)
         # Fetch restaurant information based on the provided restaurant_id
-        selected_restaurant = f.get_information(restaurant_id,'restaurant')
+   
+    else:
+        return redirect(url_for('home'))
 
-        cursor.execute("SELECT * FROM menu WHERE restaurant_id = ? ",(restaurant_id,))
-        restaurantMenu = cursor.fetchall()
-
-        conn.close()
-        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=restaurantMenu, customer_id=customer_id)
-    else:  # login failed
-            return redirect(url_for("login"))
-        
- 
 
 @app.route("/delivery_timer")
 def delivery_timer():
