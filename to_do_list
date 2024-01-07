@@ -22,7 +22,7 @@ redesign Opening time feature
 
 order_cart(restaurant):
 a pop up alert message for making sure input by user
-	bug(edit_status edit every order status instead of 1)
+	bug(edit_status edit every order status instead of 1)  (Kai)
 implement new status button for food status 		(raj)
 
 history(customer and restaurant)
