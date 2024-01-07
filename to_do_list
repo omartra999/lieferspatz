@@ -1,20 +1,19 @@
 Bug:
 when editing restaurant_information, all information are gone
-registering opening time doesnt link with the right resstaurant
+registering opening time doesnt link with the right resstaurant 	(kai)
 
 Feature needed:
 In general:
--picture with the database
+-picture with the database				(kaothur)
 -sorting algorthim(create file algorthim.py)
--edit comparable plz from restaurant
+-edit comparable plz from restaurant		(raj)
 
 order_cart(customer):
 -show neccesary detail(delivery time)
 -implement new feature
-(repeated item wont stack)
-(button for customer to add description)
-(button for customer when they received delivering food)
-bug(edit_status edit every order status instead of 1)
+(repeated item wont stack)			(omar)
+(button for customer to add description)		(raj)
+bug(edit_status edit every order status instead of 1) 		(kai)
 
 restaurant_home
 implement a way for delivery range
@@ -24,6 +23,7 @@ redesign Opening time feature
 order_cart(restaurant):
 a pop up alert message for making sure input by user
 	bug(edit_status edit every order status instead of 1)
+implement new status button for food status 		(raj)
 
 history(customer and restaurant)
-not done
+not done					(raj)
