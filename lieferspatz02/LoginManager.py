@@ -15,7 +15,4 @@ class loginManager:
         restarant_query = "SELECT * FROM restaurant WHERE username = ? AND password = ?"
         with self.connection:
             result = self.cursor.execute(restarant_query, (username, password,)).fetchone()
-            if result[0] > 0: 
-                return result
-            else: 
-                return False
+            return result
