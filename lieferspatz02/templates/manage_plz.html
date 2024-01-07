@@ -15,9 +15,6 @@
         <input type="number" name="del_plz" id="del_plz" required>
         <button type="submit" name="action" value="add_postal">Add PLZ</button>
     </form>
-    <form action="/add_postal" method="POST">
-        <button type="submit" name="action" value="submit_postals">Submit</button>
-    </form>
     <h4>added areas:</h4>
     <ul>
         {% for plz in plz_list %}
@@ -27,4 +24,7 @@
     {% if show_skip %}
     <a href="/restaurant_home" class="button-link">skip to profile overview</a>
     {% endif %}
+    <form action="/add_postal" method="POST">
+        <button type="submit" name="action" value="submit_postals">Click Here to Confirm</button>
+    </form>
 {% endblock %}
