@@ -5,6 +5,7 @@ import sqlite3
 from decorator import login_required_customer,login_required_restaurant
 from functions import f
 from Customer import customer
+from Restaurant import _restaurant
 
 order_cart = Blueprint('order_cart', __name__)
 connection = "C:\\Users\\User\\Desktop\\Uni\\lieferspatz-main\\lieferspatz02\\Lieferspatz.db"
@@ -12,14 +13,10 @@ connection = "C:\\Users\\User\\Desktop\\Uni\\lieferspatz-main\\lieferspatz02\\Li
 @order_cart.route('/restaurant_order',  methods = ["POST","GET"])
 @login_required_restaurant
 def restaurant_order():#show restaurant open and accepted order
-        conn = sqlite3.connect(connection)
-        cursor = conn.cursor()
-
-        #DB procedure
-        open_query =  "SELECT * FROM Orders WHERE restaurant_id =  ? AND STATUS = 'open'" 
+        
         restaurant_id = session.get('restaurant_id')
-        open_orders = cursor.execute(open_query, (restaurant_id,)).fetchall()
-        print("order[0]:",open_orders[0])
+        restaurant = _restaurant(restaurant_id, connection)
+        open_orders = restaurant.get_open_orders()
         #get all order information and sort it
         all_open_order = []
         if open_orders:
@@ -31,10 +28,8 @@ def restaurant_order():#show restaurant open and accepted order
                     "order": order
                     }
                     all_open_order.append(template_data)
-        accepted_query =  "SELECT * FROM Orders WHERE restaurant_id =  ? AND (STATUS = 'accepted' OR STATUS = 'preparing')" 
-        accepted_orders = cursor.execute(accepted_query, (restaurant_id,)).fetchall()
+        accepted_orders = restaurant.get_accepted_orders()
         all_accepted_order = []
-        print("order[1]:",)
         if accepted_orders:
             for order in accepted_orders:
                     template_data = {
@@ -47,21 +42,16 @@ def restaurant_order():#show restaurant open and accepted order
         all_order = [all_open_order,all_accepted_order]
         print("orders:", all_order)
         return render_template("restaurant_cart.html",all_order = all_order, restaurant_id = restaurant_id)
-
+    
 @order_cart.route('/update_status', methods = ["POST"])
 @login_required_restaurant
 def update_status():#edit order status
       status = request.form['status']
       order_id = request.form['order_id']
       print(order_id)
-      conn = sqlite3.connect(connection)
-      cursor = conn.cursor()
       restaurant_id = session.get('restaurant_id')
-      query = "UPDATE Orders SET status = ? WHERE id = ? AND restaurant_id = ?"
-      cursor.execute(query, (status,order_id, restaurant_id,))
-      conn.commit()
-      cursor.close()
-      conn.close()
+      restaurant = _restaurant(restaurant_id,connection)
+      restaurant.update_order_status(order_id,status)
       return redirect(url_for('order_cart.restaurant_order'))
 
 @order_cart.route('/your_history', methods=['GET', 'POST'])
@@ -97,18 +87,12 @@ def customer_history():#show customer history
 @order_cart.route('/restaurant_history', methods=['GET', 'POST'])
 def restaurant_history():#show restaurant history
 
-    conn = sqlite3.connect(connection)
-    cursor = conn.cursor()
-
-    user_type = request.form.get('user_type')
-    id = session.get("user_id")
-    
+    restaurant_id = session.get("restaurant_id")
+    print("restaurant_id:", restaurant_id)
+    restaurant = _restaurant(restaurant_id, connection)    
     # show history 
-    if request.method == 'POST':
-        print(user_type)
-        query = "SELECT * FROM Orders WHERE restaurant_id = ? AND Status = 'delivered' OR Status = 'delivering'"
-
-        history = cursor.execute(query, (id,)).fetchall()
+    if request.method == 'GET':
+        history = restaurant.get_order_history()
         all_history = []
         #same format as below
         if history:
@@ -117,6 +101,7 @@ def restaurant_history():#show restaurant history
                     "menu": f.get_information(p[1], 'menu'),
                     "restaurant": f.get_information(p[2], 'restaurant'),
                     "customer": f.get_information(p[3], 'customer'),
+                    "status": p[7],
                     "history": p
                 }
                 all_history.append(template_data)
@@ -128,20 +113,11 @@ def restaurant_history():#show restaurant history
 
 @order_cart.route('/clear_history', methods = ['POST', 'GET'])
 def clear_history():#clear history **testing for global
-      
-      conn = sqlite3.connect(connection)
-      cursor = conn.cursor()
-      user_type =  request.form.get("user_type")
-      id = session.get('restaurant_id')
-
-      ##query = "DELETE FROM Orders WHERE " + user_type + "_id = ? AND STATUS ='delivered' " (testing if it can work)
-      query = "DELETE FROM Orders WHERE restaurant_id = ? AND STATUS ='delivered' "
-      cursor.execute(query, (id,))
-      conn.commit()
-      flash('History cleared successfully', 'success')
-      cursor.close()
-      conn.close()
-      return redirect(url_for("restaurant_home"))
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    restaurant.clear_history() 
+    flash('History cleared successfully', 'success')
+    return redirect(url_for("restaurant_home"))
 
 @order_cart.route('/add_to_cart', methods=['POST'])
 def add_to_cart():# add item into SESSION
@@ -183,7 +159,7 @@ def view_cart():
             "order" : order
             }
             all_order.append(template_data)
-    print(all_order)
+            
     # Pass the items to the HTML template
     return render_template("customer_cart.html", cart_items=cart_items,all_order = all_order)
 

@@ -176,6 +176,16 @@ class _restaurant:
         except Exception as e:
             print(f"an Error accured: {e}")
 
+    def get_item(self, item_id):
+        try:
+            with self.connection:
+                query = "SELECT item_name, detail, price, type FROM menu WHERE restaurant_id = ? AND id = ?"
+                item = self.cursor.execute(query, (self.id, item_id)).fetchall()
+                return item
+        except Exception as e:
+            print(f"an error occured: {e}")
+            return False
+
     def getFood(self):
         try:
             with self.connection:
@@ -198,7 +208,7 @@ class _restaurant:
     def getMenu(self):
         try:
             with self.connection:
-                query = "SELECT item_name, detail, price, type FROM menu WHERE restaurant_id = ?"
+                query = "SELECT id ,item_name, detail, price, type FROM menu WHERE restaurant_id = ?"
                 menu = self.cursor.execute(query,(self.id,)).fetchall()
                 return menu
         except Exception as e:
@@ -287,9 +297,19 @@ class _restaurant:
     def get_open_orders(self):
         try:
             with self.connection:
-                query = "SELECT customer_id, item_id FROM orders WHERE restaurant_id = ?, status = open "
+                query = "SELECT * FROM Orders WHERE restaurant_id =  ? AND STATUS = 'open'" 
                 orders = self.cursor.execute(query, (self.id,)).fetchall()
-                return(orders)
+                return (orders)
+        except Exception as e:
+            print(f"an error accured: {e}")
+            return False
+
+    def get_accepted_orders(self):
+        try:
+            with self.connection:
+                query = "SELECT * FROM Orders WHERE restaurant_id =  ? AND (STATUS = 'accepted' OR STATUS = 'preparing')"
+                orders = self.cursor.execute(query, (self.id,)).fetchall()
+                return (orders)
         except Exception as e:
             print(f"an error accured: {e}")
             return False
@@ -297,7 +317,7 @@ class _restaurant:
     def update_order_status(self, order_id, status):
         try:
             with self.connection:
-                query = "UPDATE orders SET status = ? WHERE restaurant_id = ? AND id = ? "
+                query = "UPDATE Orders SET status = ? WHERE restaurant_id = ? AND id = ? "
                 self.cursor.execute(query,(status,self.id,order_id,))
             self.connection.commit()
             return True
@@ -307,9 +327,20 @@ class _restaurant:
     def get_order_history(self):
         try:
             with self.connection:
-                query = "SELECT id, customer_id, status FROM orders WHERE restaurant_id = ?"
-                orders = self.cursor.execute(query, (self.id))
+                query = "SELECT * FROM Orders WHERE restaurant_id = ? "
+                orders = self.cursor.execute(query, (self.id,)).fetchall()
                 return orders
         except Exception as e:
             print(f"an error accured: {e}")
             return False
+        
+    def clear_history(self):
+        try:
+            with self.connection:
+                query = "DELETE FROM Orders WHERE restaurant_id = ? AND STATUS ='delivered' "
+                self.cursor.execute(query,(self.id,))
+            self.connection.commit()
+            return True
+        except Exception as e: 
+            print(f"an error accured: {e}")
+    
