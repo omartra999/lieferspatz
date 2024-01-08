@@ -26,14 +26,14 @@
     {% if cart_items %}
         <ul>
             {% for item in cart_items %}
-                <div class="form-group">
                 <li>
-                   Name: {{ item.item_name }} - Price: {{ item.price }} - Type: {{ item.type }} - Quantity : {{ item.quantity }}
+                    {{ item.item_name }} - Price: {{ item.price }} - Type: {{ item.type }}
+                    <!-- Add more details as needed -->
                 </li>
-            </div>
             {% endfor %}
         </ul>
         <form action="{{url_for('order_cart.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
+            <input type="hidden" value ="Are you sure you want to submit?" name="pop_out">
             <input type="submit" value="Submit" class="button">
         </form>
         <form action="{{url_for('order_cart.clear_cart')}}" method="POST">
@@ -43,7 +43,7 @@
         <p>Your cart is empty.</p>
     {% endif %}
 
-    <h1>Your Order History</h1>
+    <h1> Order Status</h1>
     {% if all_order %}
         <ul>
             {% for current_order in all_order %}

@@ -12,6 +12,11 @@
                     }
                 }, 10000); // 10 seconds (10000 milliseconds)
             });
+            function confirmSubmission() {
+            var pop_up = document.getElementsByName('pop_out')[0].value;
+            var confirmation = confirm(pop_up);
+            return confirmation;
+            }
         </script>
         
     </head>
