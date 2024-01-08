@@ -33,7 +33,7 @@
             </div>
             {% endfor %}
         </ul>
-        <form action="{{url_for('order_cart.submit_order')}}" method="POST">
+        <form action="{{url_for('order_cart.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
             <input type="submit" value="Submit" class="button">
         </form>
         <form action="{{url_for('order_cart.clear_cart')}}" method="POST">
