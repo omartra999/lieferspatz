@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Add to Cart{% endblock %}
 {% block button %}
-    <a href="/home" class="button-link">Home</a>
+    <a href="/restaurant_home" class="button-link">Home</a>
     <form action="/logout_customer" method="POST">
         <input type="submit" value="Logout" class="button-link">
     </form>
@@ -20,7 +20,7 @@
         <ul>
             {% for history in all_history %}
                 <li>
-                    {{ history.menu[1] }} - Restaurant: {{ history.restaurant[2] }} - Customer: {{ history.customer[1] }}
+                    {{ history.menu[2] }} - Restaurant: {{ history.restaurant[2] }} - Customer: {{ history.customer[1] }} - Status: {{ history.status }}
                     <!-- Add more details as needed -->
                 </li>
             {% endfor %}
