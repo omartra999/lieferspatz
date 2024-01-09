@@ -6,7 +6,7 @@ Feature needed:
 In general:
 -picture with the database				(kaothur)
 -sorting algorthim(create file algorthim.py)
--edit comparable plz from restaurant		(raj)
+-edit comparable plz from restaurant		(raj) (done)
 
 order_cart(customer):
 -show neccesary detail(delivery time)
