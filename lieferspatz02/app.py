@@ -559,11 +559,24 @@ def add_items():
 @login_required_customer
 def home():
     
+    def fetch_user_plz(user_id):
+        # Replace this with your code to fetch user_plz from your database
+        conn = sqlite3.connect(connection)
+        cursor = conn.cursor()
+        cursor.execute("SELECT plz FROM customer WHERE id = ?", (user_id,))
+        user_plz = cursor.fetchone()[0]
+        conn.close()
+        return user_plz
+
     if request.method == "GET":
         
         if "username" in session and "user_id" in session:  # login success
            
-
+            user_id = session.get("user_id")
+            
+            # Fetch user_plz from your database using function above
+            user_plz = fetch_user_plz(user_id)
+            print(user_plz)
             conn = sqlite3.connect(connection)
             cursor = conn.cursor()
 
@@ -574,6 +587,8 @@ def home():
             openning_times = cursor.fetchall()
             cursor.execute("SELECT restaurant_id, item_name, price, detail, type FROM menu")
             menu = cursor.fetchall()
+            cursor.execute("SELECT restaurant_id, plz FROM postal")
+            deliverable_plz = cursor.fetchall()
             conn.close()
 
             # Get the current day and time
@@ -587,6 +602,18 @@ def home():
                         if time[2] <= current_time <= time[3]:
                             open_restaurants.append(restaurant)
                             break
+                '''
+                #!!!!!! I HAVE LEFT THIS PART IN COMMENTS TO AVOID ANY CONFUSION , this code below is for filtering by postcode , remove the comments symbols to use it
+                # Create a new array called filtered (we REMOVE restaurants that DO NOT MATCH IN PLZ here)           
+                filtered_restaurants = []
+
+                for restaurant in open_restaurants:
+                    matching_entries = [entry for entry in deliverable_plz if entry[0] == restaurant[0] and entry[1] == user_plz]
+                    if any(matching_entries):
+                        filtered_restaurants.append(restaurant)
+                # overwrite the existing list with this one (now both time and plz is checked for)
+                open_restaurants = filtered_restaurants
+                '''
 
             # Link home.html and all the restaurant
             return render_template("home.html", restaurants=open_restaurants, openning_times=openning_times, menus=menu, customer_id=session.get("user_id"))
@@ -602,7 +629,6 @@ def home():
             # Handle the case where restaurant_id is not provided
             flash("Invalid request. Please try again.")
             return redirect(url_for("home"))
-
 
 @app.route("/restaurant_menu", methods=["POST", "GET"])
 @login_required_customer
