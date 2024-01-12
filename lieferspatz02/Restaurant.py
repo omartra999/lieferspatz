@@ -1,4 +1,7 @@
 import sqlite3
+from PIL import Image
+from io import BytesIO
+import base64
 
 class _restaurant:
     def __init__(self, id, connection):
@@ -15,9 +18,6 @@ class _restaurant:
         except Exception as e:
             print(f"An Error occurred: {e}")
             return False
-
-
-
 
     def get_username(self):
         query = "SELECT username FROM restaurant WHERE id = ?"
@@ -39,7 +39,6 @@ class _restaurant:
             print(f"An Error occurred: {e}")
             return False
 
-
     def get_email(self):
         query = "SELECT email FROM restaurant WHERE id = ?"
         try:
@@ -49,7 +48,6 @@ class _restaurant:
         except Exception as e:
             print(f"An Error occurred: {e}")
             return False
-
     
     def get_plz(self):
         query = "SELECT plz FROM restaurant WHERE id = ?"
@@ -60,7 +58,6 @@ class _restaurant:
         except Exception as e:
             print(f"An Error occurred: {e}")
             return False
-
 
     def get_restaurant_name(self):
         query = "SELECT restaurantname FROM restaurant WHERE id = ?"
@@ -82,8 +79,6 @@ class _restaurant:
             print(f"An Error occurred: {e}")
             return False
 
-
-    
     def set_username(self, username):
         query = "UPDATE restaurant SET username = ? WHERE id = ?"
         if not self.userNameExists(username):
@@ -95,7 +90,6 @@ class _restaurant:
             except Exception as e:
               print(f"An Error occurred: {e}")
               return False
-
         else:
             return "Username already exists"
 
@@ -131,7 +125,6 @@ class _restaurant:
         except Exception as e:
             print(f"An Error occurred: {e}")
             return False
-
 
     def set_restaurant_name(self, name):
         query = "UPDATE restaurant SET restaurantname = ? WHERE id = ?"
@@ -297,9 +290,9 @@ class _restaurant:
     def get_open_orders(self):
         try:
             with self.connection:
-                query = "SELECT * FROM Orders WHERE restaurant_id =  ? AND STATUS = 'open'" 
-                orders = self.cursor.execute(query, (self.id,)).fetchall()
-                return (orders)
+                 query = "SELECT * FROM Orders WHERE restaurant_id =  ? AND STATUS = 'open'" 
+                 orders = self.cursor.execute(query, (self.id,)).fetchall()
+                 return (orders)
         except Exception as e:
             print(f"an error accured: {e}")
             return False
@@ -333,7 +326,7 @@ class _restaurant:
         except Exception as e:
             print(f"an error accured: {e}")
             return False
-        
+
     def clear_history(self):
         try:
             with self.connection:
@@ -342,5 +335,62 @@ class _restaurant:
             self.connection.commit()
             return True
         except Exception as e: 
-            print(f"an error accured: {e}")
-    
+            print(f"an error accured: {e}") 
+
+class logo:
+    def __init__(self, connection):
+        self.connection = sqlite3.connect(connection)
+
+    @staticmethod
+    def convertToBinaryData(filename):
+        #just so that i don't forget, this accepts the binary data  from the FileStorage object
+        blobData=filename.read()
+        print("readed: ", blobData)
+        return blobData
+
+    def updateRestaurantImage(self, restaurant_id, logo_file):
+        try:
+            with self.connection:
+                query = "UPDATE restaurant_logo SET logo = :logo WHERE restaurant_id = :id"
+                new_image_data = self.convertToBinaryData(logo_file)
+
+                if new_image_data:
+                    print("New Image Data:", new_image_data)  # Add this line
+
+                    new_image = Image.open(BytesIO(new_image_data))
+                    buffered = BytesIO()
+                    new_image.save(buffered, format="PNG")
+                    new_blob_data = buffered.getvalue()
+                    data_dict = {'logo': new_blob_data, 'id': restaurant_id}
+                    self.connection.cursor().execute(query, data_dict)
+
+                    print("Updated Image Data:", new_blob_data)  # Add this line
+
+                    return True
+                else:
+                    return False
+
+        except sqlite3.Error as error:
+            print("Failed to update restaurant image in SQLite table:", error)
+            return False
+        finally:
+            self.connection.commit()
+
+    def getLogo(self, restaurant_id):
+        try:
+            with self.connection:
+                query = "SELECT logo FROM restaurant_logo WHERE restaurant_id = ?"
+                result = self.connection.cursor().execute(query, (restaurant_id,)).fetchone()
+
+                if result:
+                    logo_data = result[0]
+                    if logo_data:
+                    # Convert the binary data to base64-encoded string
+                        logo_base64 = base64.b64encode(logo_data).decode('utf-8')
+                        return logo_base64
+
+                else:
+                    return None
+        except sqlite3.Error as error:
+            print("Failed to retrieve restaurant logo from SQLite table", error)
+            return None
