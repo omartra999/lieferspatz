@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify, redirect, url_for, render_template, request,session, flash
+from flask import Flask, jsonify, redirect, url_for, render_template, request,session, flash, send_file
 from werkzeug.datastructures import MultiDict
 from RegistrationManager import registrationManager
 from LoginManager import loginManager
@@ -7,16 +7,19 @@ from TimeManager import timeManager
 from Restaurant import _restaurant
 from PlzManager import plzManager
 from datetime import datetime
+from Restaurant import logo
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
 from order_cart_blueprint import order_cart
-from functions import f, connection
+from functions import f
 import os
+from pathlib import Path
+import io
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = "C:\\Users\\User\\Desktop\\Uni\\lieferspatz-main\\lieferspatz02\\Lieferspatz.db"
+connection = r"C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz.db"
 app.register_blueprint(order_cart, url_prefix='/order_cart')
 
 
@@ -153,8 +156,7 @@ def login():
 
         ##id check
         login = login_manager.loginCustomer(username, password)
-        print("login:", login)
-        if login:##success
+        if login > 0:##success
             session["user_id"] = login[0]
             session["username"] = username
             session["logged_in"] = True
@@ -183,7 +185,6 @@ def restaurant_login():
         login = login_manager.loginRestaurant(username, password)
         if login:##success
             session["logged_in_restaurant"] = True
-            ##optimsing may be later
             session["restaurant_id"] = login[0]
             session["email"] = login[1]
             session["username"] = login[2]
@@ -209,28 +210,29 @@ def restaurant_home():
     restaurant_id = session['restaurant_id']
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
+    logo_manager = logo(connection)
     if ('restaurant_name') in session and ('restaurant_id') in session:
 
         menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
-
         opening_times = time_manager.get_openning_times(restaurant_id)
+        logo_data = logo_manager.getLogo(restaurant_id)
         # Combine variables into a single dictionary
         template_data = {
-        "restaurantName": session['restaurant_name'],
-        "userName": session['username'],
-        "restaurantAddress": session['address'],
-        "Postal": session['plz'],
-        "mail": session['email'],
-        "des": session['description'],
-        "should_show_edit_button": True,
-        "show_menu_button": True,
-        "items": menu,
-        "range": delivery_range,
-        "openTimes": opening_times
-        # Add more variables as needed
+            "restaurantName": session['restaurant_name'],
+            "userName": session['username'],
+            "restaurantAddress": session['address'],
+            "Postal": session['plz'],
+            "mail": session['email'],
+            "des": session['description'],
+            "should_show_edit_button": True,
+            "show_menu_button": True,
+            "items": menu,
+            "range": delivery_range,
+            "openTimes": opening_times,
+            "logo_data": logo_data
         }
-        print(template_data)
+        #print(template_data)
         return render_template("restaurant_home.html", **template_data)
     else:
         return redirect(url_for('restaurant_login'))
@@ -251,6 +253,7 @@ def edit_restaurant_data():
 def update_profile():
     restaurant_id = session['restaurant_id']
     _restaurant_ = _restaurant(restaurant_id, connection) 
+    
     if request.method == "POST":
         new_username = request.form.get('username')
         new_restaurant_name = request.form.get('restaurant_name')
@@ -258,6 +261,7 @@ def update_profile():
         new_plz = request.form.get('plz')
         new_email = request.form.get('email')
         new_des = request.form.get('description')
+        
 
         if new_username:
             _restaurant_.set_username(new_username)
@@ -278,6 +282,7 @@ def update_profile():
         if new_des:
             _restaurant_.set_description(new_des)
             session['description'] = _restaurant_.get_description()
+           
         flash("profile edited successfuly")
         return redirect(url_for('restaurant_home'))
 
@@ -304,7 +309,7 @@ def logout_customer():
         print(session)
         if 'cart_items' in session:
             flash("Cart is not clear. Please clear before you log out.")
-            return redirect(url_for('order_cart.view_cart'))
+            return redirect(url_for('add_to_cart'))
         else:    
             session.clear()
             return redirect(url_for('login'))
@@ -319,6 +324,7 @@ def add_opening_time():
         form_data = MultiDict(request.form)
         #request restaurant id
         restaurant_id = session.get('restaurant_id')
+        print("restautant id: ",restaurant_id)
 
         if not restaurant_id :
             flash("restaurant id not found please make sure you are logged in")
@@ -398,9 +404,6 @@ def set_opening_times():
             return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
     else:
         return render_template("openning_times.html", should_show_add_form = show_add_form, should_show_set_form = show_set_form)
-
-
-
 
 @app.route("/edit_menu", methods = ["POST","GET"])
 @login_required_restaurant
@@ -490,44 +493,6 @@ def edit_range():
     else:
         return render_template("edit_range.html", range = postals)
 
-##manage_plz kawthar version using json to save plz as a list
-@app.route('/manage_plz',methods = ["POST","GET"])
-@login_required_restaurant
-def manage_plz():
-    restaurant_id = session.get('restaurant_id')
-    plzList = []
-    plz_manager = plzManager(connection)
-    
-    if request.method == 'POST':
-
-        action = request.form.get('action')
-        if action == 'add_plz_to_list':
-            plz_value = request.form.get('plz')
-            # Add the PLZ value to the list in the plz_manager instance
-            plzList.append(plz_value)
-            print("list: ", plzList)
-            flash("PLZ added successfully")
-            return render_template('manage_plz.html')
-
-        elif action == 'submit_plz_list':
-            plz_list_json = json.dumps(plzList)
-            # If the user submitted without entering a PLZ, submit the existing PLZ list
-            success = plz_manager.submit_plz_list(restaurant_id, plz_list_json)
-            if success:
-                flash("PLZ list submitted successfully")
-                session['plzList'] = plzList
-                plzList = []
-                return render_template('manage_plz.html')
-            else:
-                flash("Failed to submit PLZ list")
-                plzList = []
-                return render_template('manage_plz.html')
-            
-    else:
-        return render_template('manage_plz.html')
-
-
-
 @app.route("/add_items", methods = ["POST", "GET"])
 @login_required_restaurant
 def add_items():
@@ -553,12 +518,10 @@ def add_items():
     else:
         return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
 
-
-
 @app.route("/home", methods=["GET", "POST"])
 @login_required_customer
 def home():
-    
+
     def fetch_user_plz(user_id):
         # Replace this with your code to fetch user_plz from your database
         conn = sqlite3.connect(connection)
@@ -567,13 +530,11 @@ def home():
         user_plz = cursor.fetchone()[0]
         conn.close()
         return user_plz
-
+    
     if request.method == "GET":
         
         if "username" in session and "user_id" in session:  # login success
-           
             user_id = session.get("user_id")
-            
             # Fetch user_plz from your database using function above
             user_plz = fetch_user_plz(user_id)
             print(user_plz)
@@ -581,7 +542,7 @@ def home():
             cursor = conn.cursor()
 
             # retrieving data
-            cursor.execute("SELECT id, restaurantname, address, plz FROM restaurant")
+            cursor.execute("SELECT id, restaurantname, address, plz, description FROM restaurant")
             restaurants = cursor.fetchall()
             cursor.execute("SELECT restaurant_id, day, open, close FROM openning_times")
             openning_times = cursor.fetchall()
@@ -602,19 +563,16 @@ def home():
                         if time[2] <= current_time <= time[3]:
                             open_restaurants.append(restaurant)
                             break
-                '''
                 #!!!!!! I HAVE LEFT THIS PART IN COMMENTS TO AVOID ANY CONFUSION , this code below is for filtering by postcode , remove the comments symbols to use it
                 # Create a new array called filtered (we REMOVE restaurants that DO NOT MATCH IN PLZ here)           
                 filtered_restaurants = []
-
                 for restaurant in open_restaurants:
                     matching_entries = [entry for entry in deliverable_plz if entry[0] == restaurant[0] and entry[1] == user_plz]
                     if any(matching_entries):
                         filtered_restaurants.append(restaurant)
                 # overwrite the existing list with this one (now both time and plz is checked for)
                 open_restaurants = filtered_restaurants
-                '''
-
+        
             # Link home.html and all the restaurant
             return render_template("home.html", restaurants=open_restaurants, openning_times=openning_times, menus=menu, customer_id=session.get("user_id"))
         else:  # login failed
@@ -644,22 +602,52 @@ def restaurant_menu():
         selected_restaurant = f.get_information(restaurant_id,'restaurant') 
         return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=menu, customer_id=customer_id)
         # Fetch restaurant information based on the provided restaurant_id
-   
     else:
         return redirect(url_for('home'))
-
-
+ 
 @app.route("/delivery_timer")
 def delivery_timer():
         return render_template("delivery_timer.html")
 
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+@app.route("/add_logo", methods=["POST", "GET"])
+@login_required_restaurant
+def add_logo():
 
+    restaurant_id = session.get('restaurant_id')
+    logo_manager = logo(connection)
+    restaurant = _restaurant(restaurant_id, connection)
+    delivery_range = restaurant.get_delivery_raduis()
 
+    if request.method == "POST":
+        if 'logo' not in request.files:
+            flash('No file part')
+            return render_template("restaurant_home.html")
+        
+        logo_ = request.files['logo']
+        if logo_.filename == '':
+            flash('No selected file')
+            return render_template("restaurant_home.html")
+
+        if logo_ and allowed_file(logo_.filename):
+            add = logo_manager.updateRestaurantImage(restaurant_id,logo_)
+            print("add:", add)
+            if add:
+                flash("Logo added successfully")
+                updated_logo_data = logo_manager.getLogo(restaurant_id)
+                print("updated logo: ", updated_logo_data)
+
+                return redirect(url_for("restaurant_home"))
+            else:
+                flash("Error occurred while adding the logo")
+    return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True,range = delivery_range)
 
 
 if __name__ == "__main__":
     app.run(debug=True)
     print("current directory:", currentDirectory)
-
-
