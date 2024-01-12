@@ -11,7 +11,7 @@ from Restaurant import logo
 from decorator import login_required_customer,login_required_restaurant
 import sqlite3
 from order_cart_blueprint import order_cart
-from functions import f
+from functions import f, connection
 import os
 from pathlib import Path
 import io
@@ -156,6 +156,7 @@ def login():
 
         ##id check
         login = login_manager.loginCustomer(username, password)
+        print("login:", login)
         if login > 0:##success
             session["user_id"] = login[0]
             session["username"] = username
