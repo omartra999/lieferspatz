@@ -45,4 +45,17 @@ class registrationManager:
                 self.cursor.execute(restaurant_query, parameters_restaurant)
                 #store the id
                 restaurant_id = self.cursor.lastrowid
+                self.addDefaultRestaurantLogo(restaurant_id) #here once the restau makes a registration, it get's a defult logo
                 return True, restaurant_id
+    
+    def addDefaultRestaurantLogo(self, restaurant_id):
+        logo_query = "INSERT INTO restaurant_logo(restaurant_id, logo) VALUES (?, ?)"
+        default_logo_path = "C:\\Users\\kaouther\\Desktop\\DB Project\\static\\images\\r_logo.jpg"  #!!!guys don't forget to change the path when u update ur code
+
+        with open(default_logo_path, 'rb') as default_logo_file:
+            default_logo_data = default_logo_file.read()
+
+        parameters_logo = (restaurant_id, default_logo_data)
+
+        with self.connection:
+            self.cursor.execute(logo_query, parameters_logo)
