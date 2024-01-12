@@ -9,23 +9,28 @@
 {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
+        <div class="flashes-container"> 
             {% for msg in messages %}
-                <p>{{msg}}</p>
+                <p>{{ msg }}</p>
             {% endfor %}
+        </div>
         {% endif %}
     {% endwith %}
-    <h1>Welcome to the Restaurant Overview</h1>
 
     <body>
+        <form class="search-form" onsubmit="searchRestaurant(); return false;">
+            <input type="text" id="search" class="transparent-search-input" placeholder="Search for a restaurant" required>
+            <button type="submit" class="search-button"><span aria-hidden="true"></span>
+            </button>
+        </form>
 
         {% if restaurants %}
-            <h2>Restaurants</h2>
             <ul>
                 {% for restaurant in restaurants %}
-                    <li>
-                        <h3>{{ restaurant[1] }}</h3>
-                        <p>Address: {{ restaurant[2] }} {{ restaurant[3] }}</p>
-                        <p>Restaurant ID: {{ restaurant[0] }}</p>
+                        <div class="form-group-login">
+                        <h3 class="name-restaurant">{{ restaurant[1] }}</h3>
+                        <p>Address : {{ restaurant[2] }} {{ restaurant[3] }}</p>
+                        <p>Restaurant description: {{ restaurant[4] }}</p>
 
                         <h4>Opening Times:</h4>
                         <ul>
@@ -40,18 +45,40 @@
                             <form action="{{ url_for('restaurant_menu') }}" method="post">
                                 <input type="hidden" name="restaurant_id" value="{{ restaurant[0] }}">
                                 <input type="hidden" name="customer_id" value="{{ customer_id }}">
-                                <button type="submit">Click Here! to Order</button>
+                                <button type="submit" class="register-button">Visit Now</button>
                             </form>
-
-                           
                         </ul>
-                    </li>
+                        </div>
+                    
                 {% endfor %}
             </ul>
         {% else %}
-            <p>No restaurants available at this time : .</p>
+            <p>No restaurants available at this time :( .</p>
         {% endif %}
-    </body>
 
-   
+        <script>
+            function searchRestaurant() {
+                var searchInput = document.getElementById("search").value;
+                var restaurants = document.querySelectorAll('h3');  // Select all h3 elements
+
+                for (var i = 0; i < restaurants.length; i++) {
+                    if (restaurants[i].textContent.toLowerCase() === searchInput.toLowerCase()) {
+                        window.scrollTo({ top: restaurants[i].offsetTop, behavior: 'smooth' });
+                        return;
+                    }
+                }
+
+                // flash message if the restaurant is not found :/
+                var flashMessage = document.createElement("p");
+                flashMessage.textContent = "This restaurant doesn't exist in our database or it's closed at the moment.";
+                flashMessage.classList.add("flash-message");
+                document.body.appendChild(flashMessage);
+
+                // this is to remove the flash message after a few seconds :)
+                setTimeout(function() {
+                    flashMessage.remove();
+                }, 5000);
+            }
+        </script>
+    </body>
 {% endblock %}

@@ -1,13 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
 {% block button %}
-<form action="{{ url_for('order_cart.restaurant_order') }}" method="POST">
-    <input type="submit" value="My Orders" class="button-link">
-</form>
 <form action="/logout_restaurant" method="POST">
     <input type="submit" value="Logout" class="button-link">
 </form>
-
 {% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
@@ -21,6 +17,21 @@
     {% endwith %}
     
     <h1>Welcome, {{ restaurantName }}!</h1>
+    <div class="form-group">
+        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
+            <label for="logo">Upload Logo:</label>
+            <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
+            <button type="submit" value="submit" class="button-link">Upload</button>
+        </form>
+        {% if logo_data %}
+            <p>Current Logo:</p>
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo">
+        {% else %}
+            <p>No logo uploaded yet. Displaying default logo:</p>
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo">
+        {% endif %}
+    </div>
+
     <div class = "form-group">
         <ul>
             <li>Restaurant Name: <span>{{ restaurantName }}</span></li>
@@ -122,10 +133,10 @@
         <h3>Delivery  Range</h3>
         <table>
             <thead><tr><th>Postal Code</th></tr></thead>
-            {% for _area in range %}
+            {% for area in range %}
             <tbody>
 
-                <tr><td>{{ _area[0] }}</td></tr>
+                <tr><td>{{ area[0] }}</td></tr>
             </tbody>
 
         </table>
