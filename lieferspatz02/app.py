@@ -157,7 +157,7 @@ def login():
         ##id check
         login = login_manager.loginCustomer(username, password)
         print("login:", login)
-        if login > 0:##success
+        if login :##success
             session["user_id"] = login[0]
             session["username"] = username
             session["logged_in"] = True
