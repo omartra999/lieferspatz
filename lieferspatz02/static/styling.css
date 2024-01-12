@@ -1,6 +1,7 @@
 
 body {
     background-color: #9ce5e8;
+    background-attachment: fixed;
     background-image: url('/static/images/background.png');
     margin-top: auto;
     margin-bottom: auto;
@@ -253,4 +254,70 @@ input[type="radio"] {
 input[type="radio"]:checked {
     background-color: #e6c2bf; /* Change background color when checked */
     border-color: black; /* Change border color when checked */
+}
+.form-container-home{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    flex-basis: auto;
+    align-items: center;
+    flex-direction: row;
+    padding-top: 55px;
+    padding-bottom: 60px;
+    margin-top: 50px;
+     /* Apply animation */
+    animation: slideInFromLeft 0.5s ease-out; 
+}
+.search-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px; 
+}
+
+.transparent-search-input {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    border-width: 0.5px;
+    font-size: 25px;
+    padding: 10px; 
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.search-button {
+    background-color: #e6c2bf;
+    color: #ffffff;
+    font-weight: bolder;
+    font-size: 30px; /* Adjust the font size as needed */
+    padding: 10px 40px; /* Adjust the padding as needed */
+    margin-top: 3px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    display: block;
+    position: relative;
+    height: 40px;
+    width: 50px;
+}
+
+.search-button span {
+    background-image: url('/static/images/search-loop.png');
+    background-size: contain; /* Use contain instead of cover to fit the image within the button */
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 10px;
+    height: 7px;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 50px;
+}
+.name-restaurant{
+    color: #e6c2bf;
 }
