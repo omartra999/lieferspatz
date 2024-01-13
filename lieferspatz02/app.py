@@ -7,8 +7,8 @@ from TimeManager import timeManager
 from Restaurant import _restaurant
 from PlzManager import plzManager
 from datetime import datetime
-from Restaurant import logo
 from decorator import login_required_customer,login_required_restaurant
+from Customer import customer
 import sqlite3
 from order_cart_blueprint import order_cart
 from functions import f, connection
@@ -211,13 +211,12 @@ def restaurant_home():
     restaurant_id = session['restaurant_id']
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
-    logo_manager = logo(connection)
     if ('restaurant_name') in session and ('restaurant_id') in session:
 
         menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
         opening_times = time_manager.get_openning_times(restaurant_id)
-        logo_data = logo_manager.getLogo(restaurant_id)
+        logo_data = restaurant.getLogo()
         # Combine variables into a single dictionary
         template_data = {
             "restaurantName": session['restaurant_name'],
@@ -425,7 +424,6 @@ def delete_items():
     restaurant = _restaurant(restaurant_id, connection)
     if request.method == "POST":
         items_to_delete = request.form.getlist("items_to_delete")
-
         for item in items_to_delete:
             if restaurant.delete_item(item):
                 flash("Items deleted successfully")
@@ -573,7 +571,6 @@ def allowed_file(filename):
 def add_logo():
 
     restaurant_id = session.get('restaurant_id')
-    logo_manager = logo(connection)
     restaurant = _restaurant(restaurant_id, connection)
     delivery_range = restaurant.get_delivery_raduis()
 
@@ -588,11 +585,11 @@ def add_logo():
             return render_template("restaurant_home.html")
 
         if logo_ and allowed_file(logo_.filename):
-            add = logo_manager.updateRestaurantImage(restaurant_id,logo_)
+            add = restaurant.updateRestaurantImage(logo_)
             print("add:", add)
             if add:
                 flash("Logo added successfully")
-                updated_logo_data = logo_manager.getLogo(restaurant_id)
+                updated_logo_data = restaurant.getLogo()
                 print("updated logo: ", updated_logo_data)
 
                 return redirect(url_for("restaurant_home"))

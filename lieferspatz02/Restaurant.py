@@ -346,7 +346,7 @@ class _restaurant:
     def updateRestaurantImage(self, logo_file):
         try:
             with self.connection:
-                query = "UPDATE restaurant_logo SET logo = :logo WHERE restaurant_id = ?"
+                query = "UPDATE restaurant_logo SET logo = :logo WHERE restaurant_id = :id"
                 new_image_data = self.convertToBinaryData(logo_file)
 
                 if new_image_data:
@@ -390,4 +390,3 @@ class _restaurant:
         except sqlite3.Error as error:
             print("Failed to retrieve restaurant logo from SQLite table", error)
             return None
-    
