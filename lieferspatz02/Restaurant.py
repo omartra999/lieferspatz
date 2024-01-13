@@ -336,22 +336,17 @@ class _restaurant:
             return True
         except Exception as e: 
             print(f"an error accured: {e}") 
-
-class logo:
-    def __init__(self, connection):
-        self.connection = sqlite3.connect(connection)
-
-    @staticmethod
+    @staticmethod    
     def convertToBinaryData(filename):
         #just so that i don't forget, this accepts the binary data  from the FileStorage object
         blobData=filename.read()
         print("readed: ", blobData)
         return blobData
-
-    def updateRestaurantImage(self, restaurant_id, logo_file):
+    
+    def updateRestaurantImage(self, logo_file):
         try:
             with self.connection:
-                query = "UPDATE restaurant_logo SET logo = :logo WHERE restaurant_id = :id"
+                query = "UPDATE restaurant_logo SET logo = :logo WHERE restaurant_id = ?"
                 new_image_data = self.convertToBinaryData(logo_file)
 
                 if new_image_data:
@@ -361,7 +356,7 @@ class logo:
                     buffered = BytesIO()
                     new_image.save(buffered, format="PNG")
                     new_blob_data = buffered.getvalue()
-                    data_dict = {'logo': new_blob_data, 'id': restaurant_id}
+                    data_dict = {'logo': new_blob_data, 'id': self.id}
                     self.connection.cursor().execute(query, data_dict)
 
                     print("Updated Image Data:", new_blob_data)  # Add this line
@@ -376,11 +371,12 @@ class logo:
         finally:
             self.connection.commit()
 
-    def getLogo(self, restaurant_id):
+    
+    def getLogo(self):
         try:
             with self.connection:
                 query = "SELECT logo FROM restaurant_logo WHERE restaurant_id = ?"
-                result = self.connection.cursor().execute(query, (restaurant_id,)).fetchone()
+                result = self.cursor.execute(query, (self.id,)).fetchone()
 
                 if result:
                     logo_data = result[0]
@@ -394,3 +390,4 @@ class logo:
         except sqlite3.Error as error:
             print("Failed to retrieve restaurant logo from SQLite table", error)
             return None
+    
