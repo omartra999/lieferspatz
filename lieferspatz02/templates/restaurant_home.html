@@ -65,11 +65,12 @@
 
         </form>
     {% endif %}
-    <div class = "form-group">
+    <div class = "form-group">        
         <h3>Menu</h3>
         <table>
             <thead>
                 <tr>
+                    <th>Item ID</th>
                     <th>Item Name</th>
                     <th>Description</th>
                     <th>Price</th>
@@ -83,6 +84,7 @@
                     <td>{{ item[1] }}</td>
                     <td>{{ item[2] }}</td>
                     <td>{{ item[3] }}</td>
+                    <td>{{ item[4] }}</td>
                 </tr>
             {% endfor %}
 
