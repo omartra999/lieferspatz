@@ -219,11 +219,11 @@ class _restaurant:
             print(f"an error accured: {e}")
             return False
     
-    def delete_item(self, item_name):
+    def delete_item(self, item_id):
         try:
             with self.connection:
-                query = "DELETE FROM menu WHERE restaurant_id = ? AND item_name = ?"
-                self.cursor.execute(query, (self.id, item_name,))
+                query = "DELETE FROM menu WHERE restaurant_id = ? AND id = ?"
+                self.cursor.execute(query, (self.id, item_id,))
             self.connection.commit()
             return True
         except Exception as e:
