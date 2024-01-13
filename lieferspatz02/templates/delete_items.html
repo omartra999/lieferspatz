@@ -21,8 +21,8 @@
         <ul>
             {% for item in items %}
             <li>
-                <input type="checkbox" id="item_{{ item[0] }}" name="items_to_delete" value="{{ item[0] }}">
-                <label for="item_{{ item[0] }}">{{ item[0] }}</label>
+                <input type="checkbox" id="item_{{ item[1] }}" name="items_to_delete" value="{{ item[0] }}">
+                <label for="item_{{ item[1] }}">{{ item[1] }}</label>
             </li>
             {% endfor %}
         </ul>
