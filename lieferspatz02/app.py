@@ -425,9 +425,9 @@ def delete_items():
     restaurant = _restaurant(restaurant_id, connection)
     if request.method == "POST":
         items_to_delete = request.form.getlist("items_to_delete")
-        print(items_to_delete)
+
         for item in items_to_delete:
-            if restaurant.delete_item(item_name=item):
+            if restaurant.delete_item(item):
                 flash("Items deleted successfully")
             else:
                 flash("an error accured")
