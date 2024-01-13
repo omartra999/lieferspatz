@@ -57,6 +57,51 @@ class customer:
         except Exception as e:
             print(f"an error occured : {e}")
             return False
+
+    def get_available_restaurants(self):
+        try:
+            with self.connection:
+                restaurants_query = "SELECT id, restaurantname, address, plz FROM restaurant"
+                customer_plz_query = "SELECT plz FROM customer WHERE id = ?"
+                opening_times_query = "SELECT restaurant_id, day, open, close FROM openning_times"
+                menu_query = "SELECT restaurant_id, item_name, price, detail, type FROM menu"
+                postal_query = "SELECT restaurant_id, plz FROM postal"
+                menu = self.cursor.execute(menu_query).fetchall()
+                restaurants = self.cursor.execute(restaurants_query).fetchall()
+                opening_times = self.cursor.execute(opening_times_query).fetchall()
+                customer_postal = self.cursor.execute(customer_plz_query, (self.id,)).fetchall()
+                print("customer postal: ", customer_postal)
+                delivery = self.cursor.execute(postal_query).fetchall()
+
+                current_day = datetime.now().strftime("%A")
+                current_time = datetime.now().strftime("%H:%M")
+
+                open_restaurants = []
+                for restaurant in restaurants:
+                    for time in opening_times:
+                        if restaurant[0] == time[0] and current_day.lower() == time[1].lower():
+                            if time[2] <= current_time <= time[3]:
+                                open_restaurants.append(restaurant)
+                                print(f"Added restaurant {restaurant[1]} to open restaurants.")
+                                break
+                
+
+                filtered_restaurants = []
+
+                for res in open_restaurants:
+                    matching_entries = [entry for  entry in delivery if entry[0] == res[0] and entry[1] == customer_postal[0][0]]
+                    if any(matching_entries):
+                        filtered_restaurants.append(res)
+                        print(f"Matching entries for restaurant {res[1]}: {matching_entries}")
+
+                
+                open_restaurants = filtered_restaurants
+                print("open restaurants: ", open_restaurants)
+
+                return open_restaurants, opening_times, menu
+        except Exception as e:
+            print(f"an error has occured: {e}")
+            return False
         
         
 
