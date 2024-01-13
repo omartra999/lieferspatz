@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
 {% block button %}
+<form action="{{ url_for('order_cart.restaurant_order') }}" method="POST">
+    <input type="submit" value="My Orders" class="button-link">
+</form>
 <form action="/logout_restaurant" method="POST">
     <input type="submit" value="Logout" class="button-link">
 </form>
@@ -65,12 +68,11 @@
 
         </form>
     {% endif %}
-    <div class = "form-group">        
+    <div class = "form-group">
         <h3>Menu</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Item ID</th>
                     <th>Item Name</th>
                     <th>Description</th>
                     <th>Price</th>
@@ -84,7 +86,6 @@
                     <td>{{ item[1] }}</td>
                     <td>{{ item[2] }}</td>
                     <td>{{ item[3] }}</td>
-                    <td>{{ item[4] }}</td>
                 </tr>
             {% endfor %}
 
@@ -135,10 +136,10 @@
         <h3>Delivery  Range</h3>
         <table>
             <thead><tr><th>Postal Code</th></tr></thead>
-            {% for area in range %}
+            {% for _area in range %}
             <tbody>
 
-                <tr><td>{{ area[0] }}</td></tr>
+                <tr><td>{{ _area[0] }}</td></tr>
             </tbody>
 
         </table>
