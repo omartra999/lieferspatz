@@ -40,6 +40,9 @@ class customer:
         return cart_items
     def submit_order(self, cart_items):
         try:
+            ##additional_description refers to the additional instructions textbox before the submit button
+            additional_description = request.form.get('additional_description', '') 
+            ##print(additional_description)
             query = "INSERT INTO Orders (item_id, restaurant_id, customer_id, quantity, time, date, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
             for item in cart_items:
                 parameters_order = (
@@ -50,7 +53,8 @@ class customer:
                     item['time'],
                     item['date'],
                     item['status'],
-                    item['description'],)
+                    additional_description,
+                    )
                 self.cursor.execute(query, parameters_order,)
             self.connection.commit()
             return True
