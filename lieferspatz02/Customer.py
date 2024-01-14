@@ -61,7 +61,7 @@ class customer:
     def get_available_restaurants(self):
         try:
             with self.connection:
-                restaurants_query = "SELECT id, restaurantname, address, plz FROM restaurant"
+                restaurants_query = "SELECT id, restaurantname, address, plz, description FROM restaurant"
                 customer_plz_query = "SELECT plz FROM customer WHERE id = ?"
                 opening_times_query = "SELECT restaurant_id, day, open, close FROM openning_times"
                 menu_query = "SELECT restaurant_id, item_name, price, detail, type FROM menu"
