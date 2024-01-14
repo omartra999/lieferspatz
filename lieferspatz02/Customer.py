@@ -72,10 +72,10 @@ class customer:
                 customer_postal = self.cursor.execute(customer_plz_query, (self.id,)).fetchall()
                 print("customer postal: ", customer_postal)
                 delivery = self.cursor.execute(postal_query).fetchall()
-
+                
                 current_day = datetime.now().strftime("%A")
                 current_time = datetime.now().strftime("%H:%M")
-
+                
                 open_restaurants = []
                 for restaurant in restaurants:
                     for time in opening_times:
@@ -84,7 +84,7 @@ class customer:
                                 open_restaurants.append(restaurant)
                                 print(f"Added restaurant {restaurant[1]} to open restaurants.")
                                 break
-                
+              ##print(f"open_restaurants list before plz check(only time)-> {open_restaurants}")      
 
                 filtered_restaurants = []
 
@@ -96,7 +96,7 @@ class customer:
 
                 
                 open_restaurants = filtered_restaurants
-                print("open restaurants: ", open_restaurants)
+                ##print("open restaurants (after plz check): ", open_restaurants)
 
                 return open_restaurants, opening_times, menu
         except Exception as e:
