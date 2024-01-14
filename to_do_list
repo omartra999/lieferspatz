@@ -12,7 +12,7 @@ order_cart(customer):
 -show neccesary detail(delivery time)
 -implement new feature
 (repeated item wont stack)			(omar)
-(button for customer to add description)		(raj) (need help )
+(button for customer to add description)		(raj) (done)
 (customer should see the total price)
 bug(edit_status edit every order status instead of 1) 		(kai) (done)
 
