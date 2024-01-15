@@ -1,5 +1,7 @@
 import sqlite3
 from datetime import datetime
+from flask import Flask, request
+
 class customer:
     def __init__(self, customer_id, connection):
         self.connection = sqlite3.connect(connection)
