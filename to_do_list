@@ -1,20 +1,22 @@
 Bug:
 when editing restaurant_information, all information are gone
-registering opening time doesnt link with the right resstaurant 	(kai)
+RESTAURANT_HOME:
+When uploading own jpg file, logo not showned
+EDITING MENU:
+	-When add item into the menu, empty OR reused name can be used
+EDIT_RANGE SEEMS MISSING:
+REGISTER RESTAURANT:
+when added 2nd day into openning time 1st day is missing
+
 
 Feature needed:
 In general:
--picture with the database				(kaothur)
--sorting algorthim(create file algorthim.py)
--edit comparable plz from restaurant		(raj) (done)
+--
 
 order_cart(customer):
 -show neccesary detail(delivery time)
 -implement new feature
-(repeated item wont stack)			(omar)
-(button for customer to add description)		(raj) (done)
 (customer should see the total price)
-bug(edit_status edit every order status instead of 1) 		(kai) (done)
 
 restaurant_home
 implement a way for delivery range
@@ -22,9 +24,19 @@ redesign Opening time feature
 
 
 order_cart(restaurant):
-a pop up alert message for making sure input by user
-	bug(edit_status edit every order status instead of 1)  (Kai) (done)
-implement new status button for food status 		(raj)
+Done?
 
-history(customer and restaurant)
+Testing:
+-show neccesary detail(delivery time)
+-sorting algorthim(create file algorthim.py)
+-picture with the database(kaothur)
+(button for customer to add description)(raj) (not really)
 
+Done:
+a pop up alert message for making sure input by user(kai)
+history(customer and restaurant) (Kai)
+implement new status button for food status (raj)
+bug(edit_status edit every order status instead of 1)  (Kai)
+bug(edit_status edit every order status instead of 1)  (kai)
+(repeated item wont stack)(omar)
+edit comparable plz from restaurant(raj)
