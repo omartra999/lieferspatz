@@ -8,7 +8,6 @@ from Customer import customer
 from Restaurant import _restaurant
 
 order_cart = Blueprint('order_cart', __name__)
-connection = "C:\\Users\\User\\Desktop\\Uni\\lieferspatz-main\\lieferspatz02\\Lieferspatz.db"
 
 @order_cart.route('/restaurant_order',  methods = ["POST","GET"])
 @login_required_restaurant
