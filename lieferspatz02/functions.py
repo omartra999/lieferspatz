@@ -5,7 +5,6 @@ connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
 default_logo_path =r"D:\\Study\\Sems 5\\Flask\\static\\images\\r_logo.jpg"
 
 class f:
-    connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
 
     def get_information(id,user_type): #get all information from database using id and user type
         conn = sqlite3.connect(connection)
