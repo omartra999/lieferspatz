@@ -12,3 +12,27 @@ class f:
         query =  "SELECT * FROM " + user_type + " WHERE id = ?" 
         information = cursor.execute(query, (id,)).fetchone()
         return information
+    def dlt_delivered(id, user_type):
+        try:
+            conn = sqlite3.connect(connection)
+            cursor = conn.cursor()
+
+            if user_type == 'customer':
+                query = "DELETE FROM Orders WHERE customer_id = ? AND STATUS ='delivering'"
+            elif user_type == 'restaurant':
+                query = "DELETE FROM Orders WHERE restaurant_id = ? AND STATUS ='delivering'"
+            else:
+                flash('History cleared unsuccessfully', 'failed')
+                return False
+            print(id,query)
+            cursor.execute(query, (id,))
+            conn.commit()
+            return True
+
+        except sqlite3.Error as e:
+            print(f"SQLite error: {e}")
+            return False
+
+        finally:
+            if conn:
+                conn.close()
