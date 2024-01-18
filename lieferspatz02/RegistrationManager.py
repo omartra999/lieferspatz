@@ -1,4 +1,5 @@
 import sqlite3
+from functions import default_logo_path
 class registrationManager:
     
     def __init__(self, connection):
@@ -50,7 +51,7 @@ class registrationManager:
     
     def addDefaultRestaurantLogo(self, restaurant_id):
         logo_query = "INSERT INTO restaurant_logo(restaurant_id, logo) VALUES (?, ?)"
-        default_logo_path = "C:\\Users\\kaouther\\Desktop\\DB Project\\static\\images\\r_logo.jpg"  #!!!guys don't forget to change the path when u update ur code
+        #default_logo_path = "C:\\Users\\kaouther\\Desktop\\DB Project\\static\\images\\r_logo.jpg"  #Kai make it so we only need to change from function
 
         with open(default_logo_path, 'rb') as default_logo_file:
             default_logo_data = default_logo_file.read()
