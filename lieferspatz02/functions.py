@@ -1,7 +1,8 @@
 import sqlite3
 
+##change these to own directory##
 connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-
+default_logo_path =r"D:\\Study\\Sems 5\\Flask\\static\\images\\r_logo.jpg"
 
 class f:
     connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
