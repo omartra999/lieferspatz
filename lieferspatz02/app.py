@@ -19,7 +19,6 @@ import io
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "tilhas6ise"
 currentDirectory = os.path.abspath(__file__)
-connection = r"C:\\Users\\kaouther\\Desktop\\DB Project\\Lieferspatz.db"
 app.register_blueprint(order_cart, url_prefix='/order_cart')
 
 
