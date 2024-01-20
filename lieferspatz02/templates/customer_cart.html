@@ -28,17 +28,20 @@
             {% for item in cart_items %}
                 <li>
                     {{ item.item_name }} - Price: {{ item.price }} - Quantity:{{ item.quantity}}
-                    <!-- Add more details as needed -->
+                
+                    <!-- Add a text input for order-specific description -->
+                <label for="order_description_{{ loop.index }}" style=" margin-top: 10px;" > <br> Order Description: </label>
+                <input type="text" name="order_description_{{ loop.index }}" id="order_description_{{ loop.index }}" placeholder="Enter order description">
+                    
                 </li>
             {% endfor %}
         </ul>
+
+        <p>Total Price: {{total_price}}</p>
         <form action="{{url_for('order_cart.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
             <input type="hidden" value ="Are you sure you want to submit?" name="pop_out">
             <input type="submit" value="Submit" class="button">
 
-            <!--textbox input for additional description(additional instructions) -->
-            <label for="additional_description">Additional description:</label>
-            <input type="text" name="additional_description" id="additional_description" placeholder="Enter additional description">
             
         </form>
         <form action="{{url_for('order_cart.clear_cart')}}" method="POST">
@@ -49,6 +52,19 @@
     {% endif %}
 
     <h1> Order Status</h1>
+
+        <!-- Filter Form -->
+    <form action="{{ url_for('order_cart.filter_orders') }}" method="POST" style="margin-bottom: 10px;">
+        <label for="order_status">Filter by Status:</label>
+        <select name="order_status" id="order_status">
+            <option value="All">All</option>
+            <option value="open">Open</option>
+            <option value="preparing">Preparing</option>
+            <option value="delivering">Delivering</option>
+            <!-- Add more status options as needed -->
+        </select>
+        <input type="submit" value="Filter" class="button">
+    </form>
     {% if all_order %}
         <ul>
             {% for current_order in all_order %}
