@@ -3,11 +3,12 @@ from flask import Blueprint, redirect, url_for, render_template, request,session
 from Restaurant import _restaurant
 import sqlite3
 from decorator import login_required_customer,login_required_restaurant
-from functions import f
+from functions import f,connection
 from Customer import customer
 from Restaurant import _restaurant
 
 order_cart = Blueprint('order_cart', __name__)
+
 
 @order_cart.route('/restaurant_order',  methods = ["POST","GET"])
 @login_required_restaurant
@@ -64,8 +65,7 @@ def customer_history():#show customer history
     
     if request.method == 'POST' and user_type:
         print(user_type)
-        query = "SELECT * FROM Orders WHERE customer_id = ? AND Status = 'delivered' OR Status = 'delivering'"
-
+        query = "SELECT * FROM Orders WHERE customer_id = ? AND Status = 'delivering' "
         history = cursor.execute(query, (id,)).fetchall()
         all_history = []
         print(history)
@@ -79,7 +79,7 @@ def customer_history():#show customer history
                 }
                 all_history.append(template_data)
         print(all_history)
-        return render_template("history.html", all_history=all_history)
+        return render_template("customer_history.html", all_history=all_history)
     else:
         return "No user type provided or invalid request."
     
@@ -105,18 +105,28 @@ def restaurant_history():#show restaurant history
                 }
                 all_history.append(template_data)
         print(all_history)
-        return render_template("history.html", all_history=all_history)
+        return render_template("restaurant_history.html", all_history=all_history)
     else:
         return "No user type provided or invalid request."
 
 
 @order_cart.route('/clear_history', methods = ['POST', 'GET'])
 def clear_history():#clear history **testing for global
-    restaurant_id = session.get('restaurant_id')
-    restaurant = _restaurant(restaurant_id, connection)
-    restaurant.clear_history() 
-    flash('History cleared successfully', 'success')
-    return redirect(url_for("restaurant_home"))
+    id = session.get('user_id')
+    user_type = request.form['user_type']
+    
+    if user_type == 'restaurant':
+         id =session.get("restaurant_id")
+    
+    success = f.dlt_delivered(id,user_type)
+
+    if success:
+         if user_type == 'restaurant':
+              return redirect(url_for("order_cart.restaurant_history"))
+         else:
+              return redirect(url_for('home'))
+    else:
+         flash("failed to delete history")
 
 @order_cart.route('/add_to_cart', methods=['POST'])
 def add_to_cart():# add item into SESSION
@@ -142,10 +152,19 @@ def add_to_cart():# add item into SESSION
 def view_cart():
     # customer instance to retrieve the orders
     cart_items = session.get("cart_items", [])
+    print("cart items:", cart_items)
     customer_id = session.get('user_id')
     _customer = customer(customer_id, connection)
 
     orders = _customer.get_order()
+
+    #get total price
+    total_price = 0.00
+    for item in cart_items:
+        price = float(item.get("price", 0))
+        quantity = int(item.get("quantity", 0))
+        total_price += price * quantity
+
     #create template
     all_order = []
     if orders:
@@ -158,9 +177,10 @@ def view_cart():
             "order" : order
             }
             all_order.append(template_data)
+
             
     # Pass the items to the HTML template
-    return render_template("customer_cart.html", cart_items=cart_items,all_order = all_order)
+    return render_template("customer_cart.html", cart_items=cart_items,all_order = all_order,total_price ="{:.4}".format(total_price))
 
 
 @order_cart.route('/clear_cart', methods=['POST'])
@@ -199,3 +219,35 @@ def submit_order():#submit order from session into database
     else:
         flash("an error occured please try again")
         return redirect(url_for('order_cart.view_cart'))
+    
+@order_cart.route('/filter_order', methods=['POST'])
+def filter_orders():
+     # Retrieve selected status from the form
+    selected_status = request.form.get("order_status")
+
+    # Retrieve all orders (replace this with your logic to get orders)
+    customer_id = session.get('user_id')
+    _customer = customer(customer_id, connection)
+    all_orders = _customer.get_order()
+
+    # Filter orders based on the selected status
+    if selected_status != "All":
+        filtered_orders = [order for order in all_orders if order[7] == selected_status]
+    else:
+        # If "All" is selected, show all orders
+        filtered_orders = all_orders
+        
+    print("all_order:",all_orders)
+    all_order = []
+    if filtered_orders:
+        for order in filtered_orders:
+            #template data = [ menu information, restaurant information, customer_information, order_information]
+            template_data = {
+            "menu" : f.get_information(order[1],'menu'),
+            "restaurant": f.get_information(order[2],'restaurant'),
+            "customer": f.get_information(order[3],'customer'),
+            "order" : order
+            }
+            all_order.append(template_data)
+    # Pass the filtered orders to the template
+    return render_template("customer_cart.html", all_order=all_order, cart_items=session.get("cart_items", []))
