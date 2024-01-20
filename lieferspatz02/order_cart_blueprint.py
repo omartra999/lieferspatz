@@ -148,27 +148,33 @@ def add_to_cart():# add item into SESSION
 
     
 ## this one is for viewing the cart
-@order_cart.route("/customer_cart", methods=["GET"])
+@order_cart.route("/customer_cart", methods=["GET","POST"])
 def view_cart():
+    selected_status = request.form.get("order_status")
     # customer instance to retrieve the orders
     cart_items = session.get("cart_items", [])
     print("cart items:", cart_items)
     customer_id = session.get('user_id')
     _customer = customer(customer_id, connection)
 
-    orders = _customer.get_order()
+    all_orders = _customer.get_order()
 
     #get total price
-    total_price = 0.00
-    for item in cart_items:
-        price = float(item.get("price", 0))
-        quantity = int(item.get("quantity", 0))
-        total_price += price * quantity
+    total_price = f.get_total(cart_items)
 
-    #create template
+
+     # Filter orders based on the selected status
+    if (selected_status == "All") or (selected_status is None):
+        filtered_orders = all_orders
+    else:
+        # If "All" is selected, show all orders
+        filtered_orders = [order for order in all_orders if order[7] == selected_status]
+
+    # Get the total price
+    
     all_order = []
-    if orders:
-        for order in orders:
+    if filtered_orders:
+        for order in filtered_orders:
             #template data = [ menu information, restaurant information, customer_information, order_information]
             template_data = {
             "menu" : f.get_information(order[1],'menu'),
@@ -177,7 +183,6 @@ def view_cart():
             "order" : order
             }
             all_order.append(template_data)
-
             
     # Pass the items to the HTML template
     return render_template("customer_cart.html", cart_items=cart_items,all_order = all_order,total_price ="{:.4}".format(total_price))
@@ -220,34 +225,3 @@ def submit_order():#submit order from session into database
         flash("an error occured please try again")
         return redirect(url_for('order_cart.view_cart'))
     
-@order_cart.route('/filter_order', methods=['POST'])
-def filter_orders():
-     # Retrieve selected status from the form
-    selected_status = request.form.get("order_status")
-
-    # Retrieve all orders (replace this with your logic to get orders)
-    customer_id = session.get('user_id')
-    _customer = customer(customer_id, connection)
-    all_orders = _customer.get_order()
-
-    # Filter orders based on the selected status
-    if selected_status != "All":
-        filtered_orders = [order for order in all_orders if order[7] == selected_status]
-    else:
-        # If "All" is selected, show all orders
-        filtered_orders = all_orders
-        
-    print("all_order:",all_orders)
-    all_order = []
-    if filtered_orders:
-        for order in filtered_orders:
-            #template data = [ menu information, restaurant information, customer_information, order_information]
-            template_data = {
-            "menu" : f.get_information(order[1],'menu'),
-            "restaurant": f.get_information(order[2],'restaurant'),
-            "customer": f.get_information(order[3],'customer'),
-            "order" : order
-            }
-            all_order.append(template_data)
-    # Pass the filtered orders to the template
-    return render_template("customer_cart.html", all_order=all_order, cart_items=session.get("cart_items", []))
