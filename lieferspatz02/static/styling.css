@@ -321,3 +321,64 @@ input[type="radio"]:checked {
 .name-restaurant{
     color: #e6c2bf;
 }
+
+.logo-img {
+    width: 50px; 
+    height: 50px; 
+    object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
+}
+
+.bordered-box {
+    border: 2px solid #f8f8f8;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f8f8f8; 
+    margin-bottom: 10px;
+    float: left;
+}
+
+.menu-container {
+display: flex;
+flex-wrap: wrap;
+}
+
+.info-container {
+    width: 60%; /* Adjust as needed */
+    float: left;
+}
+
+.image-container {
+    width: 40%; /* Adjust as needed */
+    float: right;
+    margin-top: 10px; /* Adjust as needed */
+}
+
+.restaurant-menu-logo-img {
+    width: 80%; /* Make the image fill its container */
+    height: auto; /* Maintain aspect ratio */
+}
+.add-to-cart-button {
+    float: right;
+    margin-top: 10px;
+}
+
+.menu-item {
+    border: 2px solid #f8f8f8;
+    border-radius: 16px;
+    background-color: #f8f8f8; 
+    margin-bottom: 20px; 
+    overflow: auto;
+    width: 100%;
+}
+
+.button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
