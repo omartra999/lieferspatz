@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
 {% block button %}
+<head>
+    <style>
+        .logo-img {
+            width: 50px; /* Set your preferred width */
+            height: 50px; /* Set your preferred height */
+            object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
+        }
+    </style>
+</head>
 <form action="/logout_restaurant" method="POST">
     <input type="submit" value="Logout" class="button-link">
 </form>
@@ -19,10 +28,11 @@
     <form action="/delete_items" method="POST" class="form-container">
         <h3>Menu Items</h3>
         <ul>
-            {% for item in items %}
+            {% for menu in all_menu %}
             <li>
-                <input type="checkbox" id="item_{{ item[1] }}" name="items_to_delete" value="{{ item[0] }}">
-                <label for="item_{{ item[1] }}">{{ item[1] }}</label>
+                <input type="checkbox" id="item_{{ menu['items'][1] }}" name="items_to_delete" value="{{ menu['items'][0] }}">
+                <label for="item_{{ menu['items'][1] }}">{{ menu['items'][1] }}</label>
+                <img class="logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="Item Logo">
             </li>
             {% endfor %}
         </ul>

@@ -27,11 +27,13 @@
         {% if restaurants %}
             <ul>
                 {% for restaurant in restaurants %}
-                        <div class="form-group-login">
+                        <div class="form-group-login"> 
+                        <img src="data:image/*;base64,{{ logo_data[loop.index0] }}" alt="Restaurant Logo">
                         <h3 class="name-restaurant">{{ restaurant[1] }}</h3>
                         <p>Address : {{ restaurant[2] }} {{ restaurant[3] }}</p>
                         <p>Restaurant description: {{ restaurant[4] }}</p>
 
+                        
                         <h4>Opening Times:</h4>
                         <ul>
                             {% for opening_time in openning_times %}

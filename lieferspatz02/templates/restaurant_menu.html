@@ -8,6 +8,15 @@
     </form>
 {% endblock %}
 {% block content %}
+<head> 
+    <style>
+        .logo-img {
+            width: 50px; /* Set your preferred width */
+            height: 50px; /* Set your preferred height */
+            object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
+        }
+    </style>
+</head>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
@@ -27,19 +36,20 @@
         {% for menu in menus %}
             <div class="menu-item">
                 <div class="bordered-box">
-                    <h4>{{ menu[1] }}</h4>
-                    <p>Price: {{ menu[3] }}</p>
-                    <p>Detail: {{ menu[2] }}</p>
-                    <p>Type: {{ menu[4] }}</p>
+                    <h4>{{ menu['menu'][1] }}</h4>
+                    <p>Price: {{ menu['menu'][3] }}</p>
+                    <p>Detail: {{ menu['menu'][2] }}</p>
+                    <p>Type: {{ menu['menu'][4] }}</p>
+                    <img class="logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
                 </div>
                 <div class="add-to-cart-button">
                     <form class="add-to-cart-form">
-                        <input type="hidden" name="item_id" value="{{ menu[0] }}">
+                        <input type="hidden" name="item_id" value="{{ menu['menu'][0] }}">
                         <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
                         <input type="hidden" name="customer_id" value="{{ customer_id }}">
-                        <input type="hidden" name="price" value="{{ menu[3] }}">
+                        <input type="hidden" name="price" value="{{ menu['menu'][3] }}">
                         <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
-                        <input type="hidden" name="item_name" value="{{ menu[1] }}">
+                        <input type="hidden" name="item_name" value="{{ menu['menu'][1] }}">
                         <input type="button" value="Add to Cart" class="button add-to-cart-btn">
                     </form>
                 </div>
