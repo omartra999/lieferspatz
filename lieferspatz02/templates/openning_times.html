@@ -102,6 +102,7 @@
                 const openingInput = document.createElement('input');
                 openingInput.type = 'time';
                 openingInput.name = `open_time[${index}]`;
+                openingInput.required = true
         
                 const closeLabel = document.createElement('label');
                 closeLabel.textContent = "Closing Time";
@@ -110,6 +111,7 @@
                 const closingInput = document.createElement('input');
                 closingInput.type = 'time';
                 closingInput.name = `close_time[${index}]`;
+                closingInput.required = true
 
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "delete day";
