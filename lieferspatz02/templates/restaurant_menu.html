@@ -31,35 +31,40 @@
     <h2>Restaurant Name: {{ restaurants[2] }}</h2>
     <p>Address: {{ restaurants[3] }}, {{ restaurants[4] }}</p>
 
-    {% if menus %}
-        <h3>Menu</h3>
-        {% for menu in menus %}
-            <div class="menu-item">
-                <div class="bordered-box">
-                    <h4>{{ menu['menu'][1] }}</h4>
-                    <p>Price: {{ menu['menu'][3] }}</p>
-                    <p>Detail: {{ menu['menu'][2] }}</p>
-                    <p>Type: {{ menu['menu'][4] }}</p>
-                    <img class="logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
-                </div>
-                <div class="add-to-cart-button">
-                    <form class="add-to-cart-form">
-                        <input type="hidden" name="item_id" value="{{ menu['menu'][0] }}">
-                        <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
-                        <input type="hidden" name="customer_id" value="{{ customer_id }}">
-                        <input type="hidden" name="price" value="{{ menu['menu'][3] }}">
-                        <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
-                        <input type="hidden" name="item_name" value="{{ menu['menu'][1] }}">
-                        <input type="button" value="Add to Cart" class="button add-to-cart-btn">
-                    </form>
-                </div>
-                <div style="clear:both;"></div> <!-- Clear the float -->
+        {% if menus %}
+            <h3>Menu</h3>
+            <div class="menu-container">
+                {% for menu in menus %}
+                    <div class="menu-item">
+                        <div class="info-container">
+                            <h4>{{ menu['menu'][1] }}</h4>
+                            <p>Price: {{ menu['menu'][3] }}</p>
+                            <p>Detail: {{ menu['menu'][2] }}</p>
+                            <p>Type: {{ menu['menu'][4] }}</p>
+                        </div>
+                        <div class="image-container">
+                            <img class="logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
+                        </div>
+                        <div class="add-to-cart-button">
+                            <form class="add-to-cart-form">
+                                <input type="hidden" name="item_id" value="{{ menu['menu'][0] }}">
+                                <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
+                                <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                                <input type="hidden" name="price" value="{{ menu['menu'][3] }}">
+                                <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
+                                <input type="hidden" name="item_name" value="{{ menu['menu'][1] }}">
+                                <input type="button" value="Add to Cart" class="button add-to-cart-btn">
+                            </form>
+                        </div>
+                        <div style="clear:both;"></div> <!-- Clear the float -->
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% else %}
+            <p>No menu items available.</p>
+        {% endif %}
         
-    {% else %}
-        <p>No menu items available.</p>
-    {% endif %}
+   
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -92,11 +97,17 @@
 
 <style>
     /* Updated styles for the bordered box with off-white color */
+    .logo-img {
+        width: 50px; 
+        height: 50px; 
+        object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
+    }
+
     .bordered-box {
         border: 2px solid #f8f8f8;
         padding: 10px;
         border-radius: 8px;
-        background-color: #f8f8f8; /* Background color for better visibility */
+        background-color: #f8f8f8; 
         margin-bottom: 10px;
         float: left;
     }
@@ -106,13 +117,16 @@
         float: right;
         margin-top: 10px;
     }
-
-    /* Clear float for proper alignment */
+  
     .menu-item {
+        border: 2px solid #f8f8f8;
+        border-radius: 16px;
+        background-color: #f8f8f8; 
+        margin-bottom: 20px; 
         overflow: auto;
+        width: 100%;
     }
 
-    /* Basic button styles */
     .button {
         background-color: #4CAF50;
         color: white;
@@ -123,6 +137,27 @@
         font-size: 14px;
         cursor: pointer;
         border-radius: 5px;
+    }
+
+    .menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    }
+
+    .info-container {
+        width: 60%; /* Adjust as needed */
+        float: left;
+    }
+
+    .image-container {
+        width: 40%; /* Adjust as needed */
+        float: right;
+        margin-top: 10px; /* Adjust as needed */
+    }
+
+    .logo-img {
+        width: 80%; /* Make the image fill its container */
+        height: auto; /* Maintain aspect ratio */
     }
 </style>
 
