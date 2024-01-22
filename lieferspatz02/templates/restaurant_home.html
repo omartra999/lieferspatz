@@ -19,23 +19,19 @@
         {% endif %}
     {% endwith %}
     
-    <h1>Welcome, {{ restaurantName }}!</h1>
-    <div class="form-group">
-        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
+    <h1 class="welcome">Welcome, {{ restaurantName }}!</h1>
+    <div class="form-group-rh">
+        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="text_rh">
             <label for="logo">Upload Logo:</label>
-            <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
+            <input type="file" id="choose a logo" class="button-link" name="logo" accept=".jpg, .jpeg, .png" required>
             <button type="submit" value="submit" class="button-link">Upload</button>
         </form>
         {% if logo_data %}
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo">
-            <form action="/delete_logo" method="POST" enctype="multipart/form-data" class="form-group">
-                <button type="submit" value="submit" class="button-link">Delete Logo #unimplemented</button>
-            </form>
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo" class="restaurant_logo">
         {% else %}
             <p>No logo uploaded yet. Displaying default logo:</p>
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo">
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo" class="restaurant_logo">
         {% endif %}
-        
     </div>
 
     <div class = "form-group">
@@ -127,7 +123,7 @@
             <a href="/delete_items" class="button-link">Delete Items from Menu</a>
             <a href="/restaurant_home" class="button-link">Back to Profile Page</a>
         </form>
-        <div class="form-group" id = "updated_menu">
+        <div id = "updated_menu">
             <h4>Menu after Update</h4>
             <ul>
                 {% for item in addedItems %}
@@ -192,11 +188,7 @@
     </div>  
     </div>
 
-    <style>
-        .menu-after-update-item {
-            margin-bottom: 10px; /* Adjust the value as needed for the desired spacing */
-        }
-    </style>
+
 
    
 {% endblock %}
