@@ -612,6 +612,7 @@ def restaurant_menu():
     if request.method == "POST":
         restaurant_id = request.form.get("restaurant_id")
         customer_id = session.get("user_id")
+        username = session.get("username")
         session["customer_id"] = customer_id
         #restaurant instance to retrieve the menu
         restaurant = _restaurant(restaurant_id, connection)
@@ -624,7 +625,7 @@ def restaurant_menu():
                 "logo": restaurant.getfoodLogo(m[0])
             }
             all_menu.append(current_menu)
-        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=all_menu, customer_id=customer_id)
+        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=all_menu, customer_id=customer_id, username = username)
         # Fetch restaurant information based on the provided restaurant_id
     else:
         return redirect(url_for('home'))
