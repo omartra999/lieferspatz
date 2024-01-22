@@ -106,16 +106,16 @@
         {% if show_menu_form %}
         <form action="/add_items" method="POST" class="form-group" enctype="multipart/form-data">
             <label for="item_name">Item Name</label>
-            <input type="text" name="item_name" id="item_name" class="transparent-input"><br><br>
+            <input type="text" name="item_name" id="item_name" class="transparent-input" required><br><br>
     
             <label for="price">Price</label>
-            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0"><br><br>
+            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0" required><br><br>
     
             <label for="detail">Details</label><br>
             <textarea id="detail" name="detail" rows="5" cols="25" class="transparent-input"></textarea><br><br>
     
             <label for="food_type">Type</label>
-            <select id="food_type" name="food_type" class="transparent-input">
+            <select id="food_type" name="food_type" class="transparent-input" required>
                 <option value="food">Food</option>
                 <option value="drink">Drink</option>
             </select><br><br>
