@@ -8,15 +8,7 @@
     </form>
 {% endblock %}
 {% block content %}
-<head> 
-    <style>
-        .logo-img {
-            width: 50px; /* Set your preferred width */
-            height: 50px; /* Set your preferred height */
-            object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
-        }
-    </style>
-</head>
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
@@ -43,7 +35,7 @@
                             <p>Type: {{ menu['menu'][4] }}</p>
                         </div>
                         <div class="image-container">
-                            <img class="logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
+                            <img class="restaurant-menu-logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
                         </div>
                         <div class="add-to-cart-button">
                             <form class="add-to-cart-form">
@@ -94,72 +86,6 @@
         });
     });
 </script>
-
-<style>
-    /* Updated styles for the bordered box with off-white color */
-    .logo-img {
-        width: 50px; 
-        height: 50px; 
-        object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
-    }
-
-    .bordered-box {
-        border: 2px solid #f8f8f8;
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #f8f8f8; 
-        margin-bottom: 10px;
-        float: left;
-    }
-
-    /* Styles for the Add to Cart button */
-    .add-to-cart-button {
-        float: right;
-        margin-top: 10px;
-    }
-  
-    .menu-item {
-        border: 2px solid #f8f8f8;
-        border-radius: 16px;
-        background-color: #f8f8f8; 
-        margin-bottom: 20px; 
-        overflow: auto;
-        width: 100%;
-    }
-
-    .button {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .menu-container {
-    display: flex;
-    flex-wrap: wrap;
-    }
-
-    .info-container {
-        width: 60%; /* Adjust as needed */
-        float: left;
-    }
-
-    .image-container {
-        width: 40%; /* Adjust as needed */
-        float: right;
-        margin-top: 10px; /* Adjust as needed */
-    }
-
-    .logo-img {
-        width: 80%; /* Make the image fill its container */
-        height: auto; /* Maintain aspect ratio */
-    }
-</style>
 
 </html>
 {% endblock %}
