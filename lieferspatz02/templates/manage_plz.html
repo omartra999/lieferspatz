@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Manage PLZ{% endblock %}
+{% block button %}<form action="/logout_restaurant" method="POST">
+    <input type="submit" value="Logout" class="button-link">
+</form>
+{% endblock %}
 {% block content %}
     <h2>Manage PLZ</h2>
     {% with messages = get_flashed_messages() %}
@@ -27,4 +31,6 @@
     <form action="/add_postal" method="POST">
         <button type="submit" name="action" value="submit_postals">Click Here to Confirm</button>
     </form>
+ <a href = "/restaurant_home" class="button-link">Back to profile overview</a>
+
 {% endblock %}
