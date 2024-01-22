@@ -16,7 +16,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <h1>Welcome to the Menu of {{ restaurants[2] }} {{ customer_id }}</h1>
+    <h1>Welcome to the Menu of {{ restaurants[2] }} {{ username }}</h1>
 
     <h2>Description: {{ restaurants[7] }}</h2>
 
@@ -25,9 +25,9 @@
 
         {% if menus %}
             <h3>Menu</h3>
-            <div class="menu-container">
+
                 {% for menu in menus %}
-                    <div class="menu-item">
+                    <div class="form-group">
                         <div class="info-container">
                             <h4>{{ menu['menu'][1] }}</h4>
                             <p>Price: {{ menu['menu'][3] }}</p>
@@ -48,10 +48,10 @@
                                 <input type="button" value="Add to Cart" class="button add-to-cart-btn">
                             </form>
                         </div>
-                        <div style="clear:both;"></div> <!-- Clear the float -->
+                        <div style="clear:both;"></div> <!--   clear the float -->
                     </div>
                 {% endfor %}
-            </div>
+            
         {% else %}
             <p>No menu items available.</p>
         {% endif %}
