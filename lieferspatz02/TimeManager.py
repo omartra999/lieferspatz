@@ -15,20 +15,21 @@ class timeManager:
             print(f"an error accured: {e}")
             return False
 
-
     def add_openning_times(self, restaurant_id, days, opens, closes):
         print(f"extracted restaurant id form session : {restaurant_id}")
         try:
             with self.connection:
+                insertQuery = "INSERT INTO openning_times(restaurant_id, day, open, close) VALUES (?,?,?,?)"
                 for day, open, close in zip(days, opens, closes):
-                    query = "INSERT INTO openning_times(restaurant_id, day, open, close) VALUES (?,?,?,?)"
-                    if self.dayExists(restaurant_id,day) == False:
-                        self.cursor.execute(query, (restaurant_id, day, open, close))
-                self.connection.commit()
+                    if self.dayExists(restaurant_id, day) == False:
+                        exec = (restaurant_id, day, open, close,)
+                        self.cursor.execute(insertQuery, (exec))
+                    self.connection.commit()
                 return True
         except Exception as e:
             print(f"An error accured: {e}")
             return False
+                    
                     
     def get_openning_times(self, restaurant_id):
         query = "SELECT * FROM openning_times WHERE restaurant_id = ?"
