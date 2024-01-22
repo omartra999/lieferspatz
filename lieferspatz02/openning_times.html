@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Registration Form{% endblock %}
+{% block button %}<form action="/logout_restaurant" method="POST">
+    <input type="submit" value="Logout" class="button-link">
+</form>
+{% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if should_show_add_form %}
+        <form action = /add_opening_time class="form-group" method="post">
+        <div id = day>
+            <div class="form-container">
+            <label for="days">Day: </label>
+            <select id="days" name="days[0]">
+                <option value="monday">monday</option>
+                <option value="tuesday">tuesday</option>
+                <option value="wednesday">wednesday</option>
+                <option value="thursday">thursday</option>
+                <option value="friday">friday</option>
+                <option value="saturday">saturday</option>
+                <option value="sunday">sunday</option>
+            </select><br><br>
+            <label for="open_time">Opening Time:</label>
+            <input id="open_time" type="time" name = "open_time[0]"><br><br>
+            <label for="close_time">Closing Time</label>
+            <input id="close_time" type="time" name = "close_time[0]"><br><br>
+            </div>
+        </div>
+        <button type="button" onclick="addDay()" class="button-link">add day</button>
+        <input type="submit" value="Submit" class="button-link">
+        </form>
+        {% endif %}
+        {% if should_show_set_form %}
+        <form action = /set_opening_times class="form-group" method="post">
+            <div id = day>
+                <div class="form-container">
+                <label for="days">Day: </label>
+                <select id="days" name="days[0]">
+                    <option value="monday">monday</option>
+                    <option value="tuesday">tuesday</option>
+                    <option value="wedensday">wedensday</option>
+                    <option value="thursday">thursday</option>
+                    <option value="friday">friday</option>
+                    <option value="saturday">saturday</option>
+                    <option value="sunday">sunday</option>
+                </select><br><br>
+                <label for="open_time">Opening Time:</label>
+                <input id="open_time" type="time" name = "open_time[0]"><br><br>
+                <label for="close_time">Closing Time</label>
+                <input id="close_time" type="time" name = "close_time[0]"><br><br>
+                </div>
+            </div>
+            <button type="button" onclick="addDay()" class="button-link">add day</button>
+            <input type="submit" value="Submit" class="button-link">
+            </form>
+            {% endif %}
+            {% if show_skip %}
+                <a href = "/add_postal" class = "button-link">skip to delivering Page</a>
+                <a href = "/restaurant_home" class = "button-link">Restaurant Overview</a>
+            {% endif %}
+        <script>
+            let index = 1; // Initialize index variable outside the function
+        
+            function addDay() {
+                const daysDiv = document.getElementById('day');
+                const daysAdded = daysDiv.getElementsByClassName('form-container').length;
+                if (daysAdded < 7)
+                {const newDayDiv = document.createElement('div');
+                newDayDiv.className = 'form-container';
+        
+                const dayLabel = document.createElement('label');
+                dayLabel.textContent = "Day";
+                dayLabel.htmlFor = "days";
+        
+                const daySelect = document.createElement('select');
+                daySelect.name = `days[${index}]`;
+                //array for all days
+                const allDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                //getting selected days
+                const selectedDays = Array.from(daysDiv.querySelectorAll('select')).map(select => select.value);
+                //filtering out selected days
+                const availableDays = allDays.filter(day => !selectedDays.includes(day));
+
+                availableDays.forEach(day => {
+                    const option = document.createElement('option');
+                    option.value = day;
+                    option.textContent = day;
+                    daySelect.appendChild(option);
+                });
+        
+                const openLabel = document.createElement('label');
+                openLabel.textContent = "Opening Time";
+                openLabel.htmlFor = "open_time";
+        
+                const openingInput = document.createElement('input');
+                openingInput.type = 'time';
+                openingInput.name = `open_time[${index}]`;
+        
+                const closeLabel = document.createElement('label');
+                closeLabel.textContent = "Closing Time";
+                closeLabel.htmlFor = "close_time";
+        
+                const closingInput = document.createElement('input');
+                closingInput.type = 'time';
+                closingInput.name = `close_time[${index}]`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "delete day";
+                deleteButton.onclick = function() {
+                daysDiv.removeChild(newDayDiv);
+        };
+        
+                index++; // Increment index after assigning names
+        
+                newDayDiv.appendChild(dayLabel);
+                newDayDiv.appendChild(daySelect);
+        
+                newDayDiv.appendChild(openLabel);
+                newDayDiv.appendChild(openingInput);
+        
+                newDayDiv.appendChild(closeLabel);
+                newDayDiv.appendChild(closingInput);
+
+                newDayDiv.appendChild(deleteButton)
+        
+                daysDiv.appendChild(newDayDiv);
+                }
+                else{
+                    alert("you already selected all days created by god fuck you take a rest")
+                }
+            }
+        </script>
+        {% endblock %}

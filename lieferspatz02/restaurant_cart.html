@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Add to Cart{% endblock %}
+{% block button %}
+    <a href="/restaurant_home" class="button-link">Return to home</a>
+    <form action="{{ url_for('order_cart.restaurant_history') }}">
+        <input type="hidden" name="user_type" value="restaurant">
+        <input type="submit" value="History" class="button-link">
+    </form>
+    <form action="/logout_restaurant" method="POST">
+        <input type="submit" value="Logout" class="button-link">
+    </form>
+{% endblock %}
+{% block content %}
+    <h1>Your Awaiting Orders</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if all_order[0] %}
+    <div class="form-group">
+        <ul>
+            {% for order in all_order[0] %}
+                <li>
+                    {{ order['menu'][2] }} - customer: {{ order['customer'][7] }} - Status: {{ order['order'][7] }}
+                    <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                        <input type="hidden" name="order_id" value="{{ order['order'][0] }}" class="button-link">
+                        <input type="hidden" name="status" value="accepted" class="button-link">
+                        <input type="submit" value="Accept" class="button-link">
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+        <p>You have no awaiting orders.</p>
+    {% endif %}
+
+    <h1>Accepted Orders</h1>
+    {% if all_order[1] %}
+    <div class="form-group">
+        <ul>
+            {% for order in all_order[1] %}
+                <li>
+                    {{ order['menu'][2] }} - customer: {{ order['customer'][7] }} - Status: {{ order['order'][7] }}
+                    <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                        <input type="hidden" name="order_id" value="{{ order['order'][0] }}">
+                        <select name="status" class="button-link">
+                            <option value="preparing">Preparing</option>
+                            <option value="delivering">Delivering</option>
+                            <option value="accepted">Accepted</option>
+                        </select>
+                        <input type="submit" value="Update Status" class="button-link">
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+        <p>You have no accepted orders.</p>
+    {% endif %}
+    {% endblock %}

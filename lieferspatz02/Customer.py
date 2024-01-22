@@ -1,7 +1,8 @@
 import sqlite3
 from datetime import datetime
 from flask import Flask, request
-
+from Restaurant import _restaurant
+from functions import f,connection
 class customer:
     def __init__(self, customer_id, connection):
         self.connection = sqlite3.connect(connection)
@@ -70,7 +71,7 @@ class customer:
                 restaurants_query = "SELECT id, restaurantname, address, plz, description FROM restaurant"
                 customer_plz_query = "SELECT plz FROM customer WHERE id = ?"
                 opening_times_query = "SELECT restaurant_id, day, open, close FROM openning_times"
-                menu_query = "SELECT restaurant_id, item_name, price, detail, type FROM menu"
+                menu_query = "SELECT restaurant_id, item_name, price, detail, types FROM menu"
                 postal_query = "SELECT restaurant_id, plz FROM postal"
                 menu = self.cursor.execute(menu_query).fetchall()
                 restaurants = self.cursor.execute(restaurants_query).fetchall()
@@ -93,18 +94,21 @@ class customer:
               ##print(f"open_restaurants list before plz check(only time)-> {open_restaurants}")      
 
                 filtered_restaurants = []
+                logo = []
 
                 for res in open_restaurants:
                     matching_entries = [entry for  entry in delivery if entry[0] == res[0] and entry[1] == customer_postal[0][0]]
                     if any(matching_entries):
                         filtered_restaurants.append(res)
                         print(f"Matching entries for restaurant {res[1]}: {matching_entries}")
+                        logodata = _restaurant(matching_entries[0][0],connection).getLogo()
+                        logo.append(logodata)
 
-                
                 open_restaurants = filtered_restaurants
-                ##print("open restaurants (after plz check): ", open_restaurants)
 
-                return open_restaurants, opening_times, menu
+                #print("open restaurants (after plz check): ", open_restaurants)
+
+                return open_restaurants, opening_times, menu, logo
         except Exception as e:
             print(f"an error has occured: {e}")
             return False
