@@ -161,7 +161,7 @@ def add_to_cart():# add item into SESSION
     
 ## this one is for viewing the cart
 @order_cart.route("/customer_cart", methods=["GET","POST"])
-def view_cart():
+def filter_orders():
     selected_status = request.form.get("order_status")
     # customer instance to retrieve the orders
     cart_items = session.get("cart_items", [])
