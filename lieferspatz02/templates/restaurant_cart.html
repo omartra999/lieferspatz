@@ -49,23 +49,30 @@
     {% if all_order[1] %}
     <div class="form-group">
         <ul>
-            {% for order in all_order[1] %}
-                <li>
-                    {{ order['menu'][2] }} - customer: {{ order['customer'][7] }} - Status: {{ order['order'][7] }}
-                    <form action="{{ url_for('order_cart.update_status') }}" method="POST">
-                        <input type="hidden" name="order_id" value="{{ order['order'][0] }}">
-                        <select name="status" class="button-link">
-                            <option value="preparing">Preparing</option>
-                            <option value="delivering">Delivering</option>
-                            <option value="accepted">Accepted</option>
-                        </select>
-                        <input type="submit" value="Update Status" class="button-link">
-                    </form>
-                </li>
+            {% for customer_name, customer_orders in all_order[1].items() %}
+                <h3>Customer: {{ customer_name }}</h3>
+                {% for their_order in customer_orders %}
+                    <li>
+                        Name: {{ their_order['menu'][2] }} - Status: {{ their_order['order'][7] }}
+                        <!-- Additional details as needed -->
+                    </li>
+                {% endfor %}
+                <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                    {% for their_order in customer_orders %}
+                        <input type="hidden" name="order_id" value="{{ their_order['order'][0] }}">
+                    {% endfor %}
+                    <select name="status" class="button-link">
+                        <option value="preparing">Preparing</option>
+                        <option value="delivering">Delivering</option>
+                        <option value="accepted">Accepted</option>
+                    </select>
+                    <input type="submit" value="Update Status" class="button-link">
+                </form>
             {% endfor %}
         </ul>
     </div>
     {% else %}
         <p>You have no accepted orders.</p>
     {% endif %}
+
     {% endblock %}
