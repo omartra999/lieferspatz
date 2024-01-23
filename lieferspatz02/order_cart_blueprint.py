@@ -17,53 +17,41 @@ def restaurant_order():#show restaurant open and accepted order
         restaurant_id = session.get('restaurant_id')
         restaurant = _restaurant(restaurant_id, connection)
         open_orders = restaurant.get_open_orders()
-        accepted_orders = restaurant.get_accepted_orders()
         #get all order information and sort it
-        open_order_by = {}
+        all_open_order = []
         if open_orders:
             for order in open_orders:
-                    customer_name = f.get_information(order[3], 'customer')[7]
-                    if customer_name not in open_order_by:
-                         open_order_by[customer_name] = []
-                    
                     template_data = {
                     "menu": f.get_information(order[1], 'menu'),
                     "restaurant": f.get_information(order[2], 'restaurant'),
                     "customer": f.get_information(order[3], 'customer'),
                     "order": order
                     }
-                    open_order_by[customer_name].append(template_data)
-
-        
-        accepted_order_by = {}
+                    all_open_order.append(template_data)
+        accepted_orders = restaurant.get_accepted_orders()
+        all_accepted_order = []
         if accepted_orders:
             for order in accepted_orders:
-                    customer_name = f.get_information(order[3], 'customer')[7]
-                    if customer_name not in accepted_order_by:
-                         accepted_order_by[customer_name] = []
-                    
                     template_data = {
                     "menu": f.get_information(order[1], 'menu'),
                     "restaurant": f.get_information(order[2], 'restaurant'),
                     "customer": f.get_information(order[3], 'customer'),
                     "order": order
                     }
-                    accepted_order_by[customer_name].append(template_data)
-        #print("accepted:",accepted_order_by)
-        all_order = [open_order_by,accepted_order_by]
-        #print("orders:", all_order)
+                    all_accepted_order.append(template_data)
+        all_order = [all_open_order,all_accepted_order]
+        print("orders:", all_order)
         return render_template("restaurant_cart.html",all_order = all_order, restaurant_id = restaurant_id)
     
 @order_cart.route('/update_status', methods = ["POST"])
 @login_required_restaurant
 def update_status():#edit order status
       status = request.form['status']
-      order_id = request.form.getlist('order_id')
-      print("all_order_id:",order_id)
+      order_id = request.form['order_id']
+      print(order_id)
       restaurant_id = session.get('restaurant_id')
       restaurant = _restaurant(restaurant_id,connection)
-      for that_id in order_id:
-        restaurant.update_order_status(that_id,status)
+      restaurant.update_order_status(order_id,status)
       return redirect(url_for('order_cart.restaurant_order'))
 
 @order_cart.route('/your_history', methods=['GET', 'POST'])
@@ -141,6 +129,7 @@ def clear_history():#clear history **testing for global
          flash("failed to delete history")
 
 @order_cart.route('/add_to_cart', methods=['POST'])
+@login_required_customer
 def add_to_cart():# add item into SESSION
  # Get item data from the AJAX request
     item_id = request.form.get('item_id')
@@ -161,7 +150,8 @@ def add_to_cart():# add item into SESSION
     
 ## this one is for viewing the cart
 @order_cart.route("/customer_cart", methods=["GET","POST"])
-def filter_orders():
+@login_required_customer
+def view_cart():
     selected_status = request.form.get("order_status")
     # customer instance to retrieve the orders
     cart_items = session.get("cart_items", [])
@@ -199,12 +189,46 @@ def filter_orders():
     # Pass the items to the HTML template
     return render_template("customer_cart.html", cart_items=cart_items,all_order = all_order,total_price ="{:.4}".format(total_price))
 
+@order_cart.route('/filter_order', methods=['POST'])
+@login_required_customer
+def filter_orders():
+     # Retrieve selected status from the form
+    selected_status = request.form.get("order_status")
+
+    # Retrieve all orders (replace this with your logic to get orders)
+    customer_id = session.get('user_id')
+    _customer = customer(customer_id, connection)
+    all_orders = _customer.get_order()
+
+    # Filter orders based on the selected status
+    if selected_status != "All":
+        filtered_orders = [order for order in all_orders if order[7] == selected_status]
+    else:
+        # If "All" is selected, show all orders
+        filtered_orders = all_orders
+
+    print("all_order:",all_orders)
+    all_order = []
+    if filtered_orders:
+        for order in filtered_orders:
+            #template data = [ menu information, restaurant information, customer_information, order_information]
+            template_data = {
+            "menu" : f.get_information(order[1],'menu'),
+            "restaurant": f.get_information(order[2],'restaurant'),
+            "customer": f.get_information(order[3],'customer'),
+            "order" : order
+            }
+            all_order.append(template_data)
+    # Pass the filtered orders to the template
+    return render_template("customer_cart.html", all_order=all_order, cart_items=session.get("cart_items", []))
+
 
 @order_cart.route('/clear_cart', methods=['POST'])
+@login_required_customer
 def clear_cart():#empty cart
     session.pop('cart_items', None)  # Remove the 'cart_items' key from the session
     flash('Cart cleared successfully', 'success')
-    return redirect(url_for('order_cart.filter_orders'))
+    return redirect(url_for('order_cart.view_cart'))
 
 @order_cart.route('/clear_order', methods=['POST'])
 @login_required_customer
@@ -217,7 +241,7 @@ def clear_order():#delete history
     flash('Order cleared successfully', 'success')
     cursor.close()
     conn.close()
-    return redirect(url_for('filter_orders'))
+    return redirect(url_for('view_cart'))
 
 
 @order_cart.route('/submit_order', methods=['POST'])
@@ -235,5 +259,5 @@ def submit_order():#submit order from session into database
         return redirect(url_for('home'))
     else:
         flash("an error occured please try again")
-        return redirect(url_for('order_cart.filter_orders'))
+        return redirect(url_for('order_cart.view_cart'))
     
