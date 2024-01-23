@@ -204,7 +204,7 @@ def filter_orders():
 def clear_cart():#empty cart
     session.pop('cart_items', None)  # Remove the 'cart_items' key from the session
     flash('Cart cleared successfully', 'success')
-    return redirect(url_for('order_cart.view_cart'))
+    return redirect(url_for('order_cart.filter_orders'))
 
 @order_cart.route('/clear_order', methods=['POST'])
 @login_required_customer
@@ -217,7 +217,7 @@ def clear_order():#delete history
     flash('Order cleared successfully', 'success')
     cursor.close()
     conn.close()
-    return redirect(url_for('view_cart'))
+    return redirect(url_for('filter_orders'))
 
 
 @order_cart.route('/submit_order', methods=['POST'])
@@ -235,5 +235,5 @@ def submit_order():#submit order from session into database
         return redirect(url_for('home'))
     else:
         flash("an error occured please try again")
-        return redirect(url_for('order_cart.view_cart'))
+        return redirect(url_for('order_cart.filter_orders'))
     
