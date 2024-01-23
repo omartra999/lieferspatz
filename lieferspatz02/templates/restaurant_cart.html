@@ -23,15 +23,21 @@
     {% if all_order[0] %}
     <div class="form-group">
         <ul>
-            {% for order in all_order[0] %}
-                <li>
-                    {{ order['menu'][2] }} - customer: {{ order['customer'][7] }} - Status: {{ order['order'][7] }}
-                    <form action="{{ url_for('order_cart.update_status') }}" method="POST">
-                        <input type="hidden" name="order_id" value="{{ order['order'][0] }}" class="button-link">
-                        <input type="hidden" name="status" value="accepted" class="button-link">
-                        <input type="submit" value="Accept" class="button-link">
-                    </form>
-                </li>
+            {% for customer_name, customer_orders in all_order[0].items() %}
+                <h3>Customer: {{ customer_name }}</h3>
+                {% for their_order in customer_orders %}
+                    <li>
+                        Name :{{ their_order['menu'][2] }} - Status: {{ their_order['order'][7] }}
+                        <!-- Additional details as needed -->
+                    </li>
+                {% endfor %}
+                <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                    {% for their_order in customer_orders %}
+                        <input type="hidden" name="order_id" value="{{ their_order['order'][0] }}">
+                    {% endfor %}
+                    <input type="hidden" name="status" value="accepted" class="button-link">
+                    <input type="submit" value="Accept" class="button-link">
+                </form>
             {% endfor %}
         </ul>
     </div>
