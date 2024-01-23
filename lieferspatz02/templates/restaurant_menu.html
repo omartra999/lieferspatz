@@ -8,7 +8,15 @@
     </form>
 {% endblock %}
 {% block content %}
-
+<head> 
+    <style>
+        .logo-img {
+            width: 50px; /* Set your preferred width */
+            height: 50px; /* Set your preferred height */
+            object-fit: cover; /* Optional: Maintain aspect ratio while filling the box */
+        }
+    </style>
+</head>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
@@ -16,47 +24,53 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <h1>Welcome to the Menu of {{ restaurants[2] }} {{ username }}</h1>
+    <h1>Welcome to the Menu of {{ restaurant_name }}, {{ customer_username }}</h1>
 
-    <h2>Description: {{ restaurants[7] }}</h2>
+    <h2>Description: {{ description }}</h2>
 
-    <h2>Restaurant Name: {{ restaurants[2] }}</h2>
-    <p>Address: {{ restaurants[3] }}, {{ restaurants[4] }}</p>
+    <h2>Restaurant Name: {{ restaurant_name }}</h2>
+    <p>Address: {{ restaurant_plz }}, {{ restaurant_adresse }}</p>
 
-        {% if menus %}
-            <h3>Menu</h3>
+    {% if menu %}
+    <!-- Menu types navigation -->
+    <ul class="menu-types-navigation">
+        {% for type, items in menu.items() %}
+            <li>
+                <button class="scroll-to-type" data-type="{{ type }}">Scroll to {{ type }}</button>
+            </li>
+        {% endfor %}
+    </ul>
 
-                {% for menu in menus %}
-                    <div class="form-group">
-                        <div class="info-container">
-                            <h4>{{ menu['menu'][1] }}</h4>
-                            <p>Price: {{ menu['menu'][3] }}</p>
-                            <p>Detail: {{ menu['menu'][2] }}</p>
-                            <p>Type: {{ menu['menu'][4] }}</p>
-                        </div>
+    {% for type, items in menu.items() %}
+        <div class="form-group" id="{{ type }}">
+            <h2>{{ type }}</h2>
+            <ul>
+                {% for item in items %}
+                    <li>
+                        <b>item name:</b> {{ item.name }} - <b>price:</b> {{ item.price }} - <b>desription</b> : {{ item.description }}
                         <div class="image-container">
-                            <img class="restaurant-menu-logo-img" src="data:image/*;base64,{{ menu['logo'] }}" alt="food Logo">
+                            <img class="restaurant-menu-logo-img" src="data:image/*;base64,{{ item['logo'] }}" alt="food Logo" height="100",width=100>
                         </div>
                         <div class="add-to-cart-button">
                             <form class="add-to-cart-form">
-                                <input type="hidden" name="item_id" value="{{ menu['menu'][0] }}">
-                                <input type="hidden" name="restaurant_id" value="{{ restaurants[0] }}">
+                                <input type="hidden" name="item_id" value="{{ item['id'] }}">
+                                <input type="hidden" name="restaurant_id" value="{{ item['restaurant_id'] }}">
                                 <input type="hidden" name="customer_id" value="{{ customer_id }}">
-                                <input type="hidden" name="price" value="{{ menu['menu'][3] }}">
-                                <input type="hidden" name="restaurant_name" value="{{ restaurants[1] }}">
-                                <input type="hidden" name="item_name" value="{{ menu['menu'][1] }}">
+                                <input type="hidden" name="price" value="{{ item['price'] }}">
+                                <input type="hidden" name="restaurant_name" value="{{ restaurant_name }}">
+                                <input type="hidden" name="item_name" value="{{ item['name'] }}">
                                 <input type="button" value="Add to Cart" class="button add-to-cart-btn">
                             </form>
                         </div>
-                        <div style="clear:both;"></div> <!--   clear the float -->
-                    </div>
+                    </li>
                 {% endfor %}
-            
-        {% else %}
-            <p>No menu items available.</p>
-        {% endif %}
-        
-   
+            </ul>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No menu items available.</p>
+{% endif %}
+
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -84,8 +98,55 @@
                 }
             });
         });
+
+
+        $(".scroll-to-type").click(function () {
+                // Get the data-type attribute value (menu type)
+                var targetType = $(this).data("type");
+
+                // Scroll to the target menu type
+                $("html, body").animate({
+                    scrollTop: $("#" + targetType).offset().top
+                }, 1000); // You can adjust the duration as needed
+            });
     });
 </script>
+
+<style>
+    /* Updated styles for the bordered box with off-white color */
+    .bordered-box {
+        border: 2px solid #f8f8f8;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f8f8f8; /* Background color for better visibility */
+        margin-bottom: 10px;
+        float: left;
+    }
+
+    /* Styles for the Add to Cart button */
+    .add-to-cart-button {
+        float: right;
+        margin-top: 10px;
+    }
+
+    /* Clear float for proper alignment */
+    .menu-item {
+        overflow: auto;
+    }
+
+    /* Basic button styles */
+    .button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+</style>
 
 </html>
 {% endblock %}
