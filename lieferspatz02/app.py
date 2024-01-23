@@ -497,9 +497,11 @@ def add_postal():
         action = request.form.get('action')
         if action == "add_postal":
             plz = request.form.get('del_plz')
-            if plz not in postals:
+            if plz not in postals and len(plz) == 5:
                 postals.append(plz)
                 print("added: ", postals)
+            else:
+                flash("enter a valid postal code")
             session['postals'] = postals
 
             return render_template('manage_plz.html', plz_list = postals)
@@ -533,7 +535,27 @@ def edit_range():
 @app.route("/add_items", methods = ["POST", "GET"])
 @login_required_restaurant
 def add_items():
+    restaurant_id = session['restaurant_id']
+    time_manager = timeManager(connection)
+    restaurant = _restaurant(restaurant_id, connection)
+    if ('restaurant_name') in session and ('restaurant_id') in session:
 
+        menu = restaurant.getMenu()
+        delivery_range = restaurant.get_delivery_raduis()
+        opening_times = time_manager.get_openning_times(restaurant_id)
+        logo_data = restaurant.getLogo()
+        # Combine variables into a single dictionary
+        template_data = {
+            "restaurantName": session['restaurant_name'],
+            "userName": session['username'],
+            "restaurantAddress": session['address'],
+            "Postal": session['plz'],
+            "mail": session['email'],
+            "des": session['description'],
+            "items": menu,
+            "openTimes": opening_times,
+            "logo_data": logo_data
+        }
     restaurant_id = session.get('restaurant_id')
     restaurant = _restaurant(restaurant_id, connection)
     if request.method == "POST":
@@ -549,13 +571,13 @@ def add_items():
         if restaurant.add_item(item_name, detail, price, types, logo):
             items = restaurant.getMenu()
             flash("item added successfuly")
-            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items, range = restaurant.get_delivery_raduis())
+            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, addedItems=items, range = restaurant.get_delivery_raduis(), **template_data)
         else:
             flash("Items are not added some Error occured")
-            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True)
+            return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True, **template_data)
     else:
-        return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
-
+        return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True, **template_data)
+    
 @app.route("/home", methods=["GET", "POST"])
 @login_required_customer
 def home():
@@ -587,6 +609,7 @@ def restaurant_menu():
     if request.method == "POST":
         restaurant_id = request.form.get("restaurant_id")
         customer_id = session.get("user_id")
+        username = session.get("username")
         session["customer_id"] = customer_id
         #restaurant instance to retrieve the menu
         restaurant = _restaurant(restaurant_id, connection)
@@ -599,7 +622,7 @@ def restaurant_menu():
                 "logo": restaurant.getfoodLogo(m[0])
             }
             all_menu.append(current_menu)
-        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=all_menu, customer_id=customer_id)
+        return render_template("restaurant_menu.html", restaurants=selected_restaurant, menus=all_menu, customer_id=customer_id, username = username)
         # Fetch restaurant information based on the provided restaurant_id
     else:
         return redirect(url_for('home'))
