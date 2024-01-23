@@ -17,8 +17,8 @@ def restaurant_order():#show restaurant open and accepted order
         restaurant_id = session.get('restaurant_id')
         restaurant = _restaurant(restaurant_id, connection)
         open_orders = restaurant.get_open_orders()
+        accepted_orders = restaurant.get_accepted_orders()
         #get all order information and sort it
-        all_open_order = []
         open_order_by = {}
         if open_orders:
             for order in open_orders:
@@ -35,31 +35,35 @@ def restaurant_order():#show restaurant open and accepted order
                     open_order_by[customer_name].append(template_data)
 
         
-        accepted_orders = restaurant.get_accepted_orders()
-        all_accepted_order = []
+        accepted_order_by = {}
         if accepted_orders:
             for order in accepted_orders:
-                    template_data = {   
+                    customer_name = f.get_information(order[3], 'customer')[7]
+                    if customer_name not in accepted_order_by:
+                         accepted_order_by[customer_name] = []
+                    
+                    template_data = {
                     "menu": f.get_information(order[1], 'menu'),
                     "restaurant": f.get_information(order[2], 'restaurant'),
                     "customer": f.get_information(order[3], 'customer'),
                     "order": order
                     }
-                    all_accepted_order.append(template_data)
-        all_order = [open_order_by,all_accepted_order]
+                    accepted_order_by[customer_name].append(template_data)
+        #print("accepted:",accepted_order_by)
+        all_order = [open_order_by,accepted_order_by]
         #print("orders:", all_order)
         return render_template("restaurant_cart.html",all_order = all_order, restaurant_id = restaurant_id)
     
-@order_cart.route('/update_status', methods = ["POST","GET"])
+@order_cart.route('/update_status', methods = ["POST"])
 @login_required_restaurant
 def update_status():#edit order status
       status = request.form['status']
-      order_id = request.form.getlist['order_id']
+      order_id = request.form.getlist('order_id')
       print("all_order_id:",order_id)
       restaurant_id = session.get('restaurant_id')
       restaurant = _restaurant(restaurant_id,connection)
-      #for that_id in order_id:
-      #  restaurant.update_order_status(that_id,status)
+      for that_id in order_id:
+        restaurant.update_order_status(that_id,status)
       return redirect(url_for('order_cart.restaurant_order'))
 
 @order_cart.route('/your_history', methods=['GET', 'POST'])
