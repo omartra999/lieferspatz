@@ -276,6 +276,25 @@ class _restaurant:
         except Exception as e: 
             print(f"an error accured: {e}")
             return False
+
+     def get_item_types(self):
+        try:
+            with self.connection:
+                query = "SELECT types FROM menu WHERE restaurant_id = ?"
+                types = self.cursor.execute(query, (self.id,)).fetchall()
+                return types
+        except Exception as e:
+            print(f"an error occured: {e}")
+            return False
+    def get_items_of_type(self, type):
+        try:
+            with self.connection:
+                query = "SELECT * FROM menu WHERE restaurant_id = ? AND types = ?"
+                items = self.cursor.execute(query,(self.id, type,)).fetchall()
+                return items
+        except Exception as e:
+            print(f"an error occured: {e}")
+            return False
     
     def get_delivery_raduis(self):
         try:
