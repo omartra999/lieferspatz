@@ -277,7 +277,7 @@ class _restaurant:
             print(f"an error accured: {e}")
             return False
 
-     def get_item_types(self):
+    def get_item_types(self):
         try:
             with self.connection:
                 query = "SELECT types FROM menu WHERE restaurant_id = ?"
