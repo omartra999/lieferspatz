@@ -59,11 +59,12 @@ def restaurant_order():#show restaurant open and accepted order
 @login_required_restaurant
 def update_status():#edit order status
       status = request.form['status']
-      order_id = request.form['order_id']
+      order_id = request.form.getlist('order_id')
       print(order_id)
       restaurant_id = session.get('restaurant_id')
       restaurant = _restaurant(restaurant_id,connection)
-      restaurant.update_order_status(order_id,status)
+      for id in order_id:
+        restaurant.update_order_status(id,status)
       return redirect(url_for('order_cart.restaurant_order'))
 
 @order_cart.route('/your_history', methods=['GET', 'POST'])
