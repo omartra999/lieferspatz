@@ -214,11 +214,22 @@ def restaurant_home():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     if ('restaurant_name') in session and ('restaurant_id') in session:
-
-        menu = restaurant.getMenu()
         delivery_range = restaurant.get_delivery_raduis()
         opening_times = time_manager.get_openning_times(restaurant_id)
         logo_data = restaurant.getLogo()
+        menu = restaurant.getMenu()
+        items = []
+        for item in menu:
+            item_dic = {
+                "item_id": item[0],
+                "item_name": item[1],
+                "item_description": item[2],
+                "item_price": item[3],
+                "item_type":item[4],
+                "item_logo":restaurant.getfoodLogo(item[0])
+            }
+            items.append(item_dic)
+        
         # Combine variables into a single dictionary
         template_data = {
             "restaurantName": session['restaurant_name'],
@@ -246,6 +257,19 @@ def edit_restaurant_data():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     delivery_range = restaurant.get_delivery_raduis()
+    menu = restaurant.getMenu()
+    items = []
+    for item in menu:
+            item_dic = {
+                "item_id": item[0],
+                "item_name": item[1],
+                "item_description": item[2],
+                "item_price": item[3],
+                "item_type":item[4],
+                "item_logo":restaurant.getfoodLogo(item[0])
+            }
+            items.append(item_dic)
+        
     template_data = {
             "restaurantName": session['restaurant_name'],
             "userName": session['username'],
@@ -256,7 +280,7 @@ def edit_restaurant_data():
             "should_show_edit_button": False,
             "should_show_edit_form" : True,
             "show_menu_button": True,
-            "items": restaurant.getMenu(),
+            "items": items,
             "range": delivery_range,
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
@@ -434,6 +458,19 @@ def edit_menu():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     delivery_range = restaurant.get_delivery_raduis()
+    menu = restaurant.getMenu()
+    items = []
+    for item in menu:
+            item_dic = {
+                "item_id": item[0],
+                "item_name": item[1],
+                "item_description": item[2],
+                "item_price": item[3],
+                "item_type":item[4],
+                "item_logo":restaurant.getfoodLogo(item[0])
+            }
+            items.append(item_dic)
+        
     template_data = {
             "restaurantName": session['restaurant_name'],
             "userName": session['username'],
@@ -443,7 +480,7 @@ def edit_menu():
             "des": session['description'],
             "show_menu_button": False,
             "show_menu_form" : True,
-            "items": restaurant.getMenu(),
+            "items": items,
             "range": delivery_range,
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
@@ -552,8 +589,18 @@ def add_items():
         price = request.form.get('price')
         types = request.form.get('types')
         logo = request.files.get('food_logo')
-        print("logo:",logo)
-        
+        menu = restaurant.getMenu()
+        items = []
+        for item in menu:
+            item_dic = {
+                "item_id": item[0],
+                "item_name": item[1],
+                "item_description": item[2],
+                "item_price": item[3],
+                "item_type":item[4],
+                "item_logo":restaurant.getfoodLogo(item[0])
+            }
+            items.append(item_dic)        
         
         
         if restaurant.add_item(item_name, detail, price, types, logo):
@@ -570,7 +617,7 @@ def add_items():
             "should_show_edit_form" : False,
             "show_menu_button": False,
             "show_menu_form":True,
-            "items": restaurant.getMenu()
+            "items": items
             "range":  restaurant.get_delivery_raduis(),
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
