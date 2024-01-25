@@ -112,7 +112,17 @@ class customer:
         except Exception as e:
             print(f"an error has occured: {e}")
             return False
-        
+
+      def get_username(self):
+        try:
+            with self.connection:
+                query = "SELECT username FROM customer where id = ?"
+                username = self.cursor.execute(query, (self.id,)).fetchone()[0]
+                return username
+        except Exception as e:
+            print(f"an error occured : {e}")
+            return False
+  
         
 
 
