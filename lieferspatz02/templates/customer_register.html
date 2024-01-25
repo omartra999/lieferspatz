@@ -4,6 +4,7 @@
 <a href="/restaurant_register" class="button-link">Create a business account</a>
 <a href="/login" class="button-link">Customer Login</a>
 {% endblock %}
+    {% block content %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="flashes-container"> 
@@ -13,7 +14,7 @@
             </div>
         {% endif %}
     {% endwith %}
-    {% block content %}
+
         <div class="form-container">
                    
             <form action = "#" method = "POST" class="form-group">
