@@ -77,10 +77,13 @@ def register():
             flash("passwords do not match")
             return render_template("customer_register.html")
         
-        ##registering
-        elif registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz):
+         ##registering
+        if registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz) == True:
             return redirect(url_for('registration_success'))
-    
+        else:
+            flash(f"error : {registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz)[1]}")
+            return render_template("customer_register.html")
+        
     ##linking to "customer_register.html" 
     else:
         return render_template("customer_register.html")
