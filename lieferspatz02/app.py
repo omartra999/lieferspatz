@@ -292,8 +292,11 @@ def update_profile():
             _restaurant_.set_address(new_address)
             session['address'] = _restaurant_.get_address()
         if new_plz :
-            _restaurant_.set_plz(new_plz)
-            session['plz'] = _restaurant_.get_plz()
+            if len(new_plz) == 5:
+                _restaurant_.set_plz(new_plz)
+                session['plz'] = _restaurant_.get_plz()
+            else:
+                flash("enter a valid plz")
         if new_email:
             _restaurant_.set_email(new_email)
             session['email'] = _restaurant_.get_email()
