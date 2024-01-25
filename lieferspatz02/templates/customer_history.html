@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Add to Cart{% endblock %}
 {% block button %}
-    <a href="/home" class="button-link">Home</a>
+    <a href="/customer/home" class="button-link">Home</a>
     <form action="/logout_customer" method="POST">
         <input type="submit" value="Logout" class="button-link">
     </form>
@@ -24,7 +24,8 @@
                     <!-- Add more details as needed -->
                 </li>
             {% endfor %}
-            <form action="{{url_for('order_cart.clear_history')}}" method="POST">
+            <form action="{{url_for('customer.clear_history')}}" method="POST" onsubmit="return confirmSubmission()">
+                <input type="hidden" value ="Are you sure that you want to delete?" name="pop_out">
                 <input type = "hidden" value = "customer" name = "user_type">
                 <input type="submit" value="Delete history" class="button">
             </form>

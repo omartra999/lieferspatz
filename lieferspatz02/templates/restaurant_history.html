@@ -24,7 +24,8 @@
                     <!-- Add more details as needed -->
                 </li>
             {% endfor %}
-            <form action="{{url_for('order_cart.clear_history')}}" method="POST">
+            <form action="{{url_for('clear_history')}}" method="POST" onsubmit="return confirmSubmission()">
+                <input type="hidden" value ="Are you sure that you want to delete?" name="pop_out">
                 <input type = "hidden" value = "restaurant" name = "user_type">
                 <input type="submit" value="Delete history" class="button">
             </form>

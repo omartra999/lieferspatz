@@ -1,9 +1,10 @@
 import sqlite3
+from decorator import *
 from flask import flash, session
 
-connection = r"D:\\Study\\Sems 5\\Flask\\Lieferspatz.db"
-default_logo_path =r"D:\\Study\\Sems 5\\Flask\\static\\images\\r_logo.jpg"
-default_food_logo = r"D:\\Study\\Sems 5\\Flask\static\\images\\unknown_food.jpg"
+connection = r"D:\\Study\\Sems 5\\Furnised\\Lieferspatz.db"
+default_logo_path =r"D:\\Study\\Sems 5\\Furnised\\static\\images\\r_logo.jpg"
+default_food_logo = r"D:\\Study\\Sems 5\\Furnised\\static\\images\\unknown_food.jpg"
 
 class f:
 
@@ -26,7 +27,7 @@ class f:
             else:
                 flash('History cleared unsuccessfully', 'failed')
                 return False
-            print(id,query)
+            #print(id,query)
             cursor.execute(query, (id,))
             conn.commit()
             return True
@@ -45,4 +46,3 @@ class f:
             quantity = int(item.get("quantity", 0))
             total_price += price * quantity
         return total_price
-    

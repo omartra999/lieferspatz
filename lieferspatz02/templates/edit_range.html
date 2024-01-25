@@ -16,7 +16,7 @@
 
 <div class="form-container">
     {% for area in range %}
-    <form action="/delete_area" class="form-container" method="POST">
+    <form action="/restaurant/delete_area" class="form-container" method="POST">
     <input type="checkbox" id="{{ area[0] }}" name="areas_to_delete" value="{{ area[0] }}">
     <label for="{{ area[0] }}">{{ area[0] }}</label>
     {% endfor %}
@@ -26,7 +26,7 @@
 </div>
    
    <a href = "/add_postal" class = "button-link">add new areas</a>
-    <a href = "/restaurant_home" class = "button-link"> back to profile overview</a>
+    <a href = "/restaurant/restaurant_home" class = "button-link"> back to profile overview</a>
 </div>
 
 {% endblock %}

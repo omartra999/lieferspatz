@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Add to Cart{% endblock %}
 {% block button %}
-    <a href="/restaurant_home" class="button-link">Return to home</a>
-    <form action="{{ url_for('order_cart.restaurant_history') }}">
+    <a href="/restaurant/restaurant_home" class="button-link">Return to home</a>
+    <form action="{{ url_for('restaurant.restaurant_history') }}">
         <input type="hidden" name="user_type" value="restaurant">
         <input type="submit" value="History" class="button-link">
     </form>
@@ -31,7 +31,7 @@
                         <!-- Additional details as needed -->
                     </li>
                 {% endfor %}
-                <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                <form action="{{ url_for('update_status') }}" method="POST">
                     {% for their_order in customer_orders %}
                         <input type="hidden" name="order_id" value="{{ their_order['order'][0] }}">
                     {% endfor %}
@@ -57,7 +57,7 @@
                         <!-- Additional details as needed -->
                     </li>
                 {% endfor %}
-                <form action="{{ url_for('order_cart.update_status') }}" method="POST">
+                <form action="{{ url_for('update_status') }}" method="POST">
                     {% for their_order in customer_orders %}
                         <input type="hidden" name="order_id" value="{{ their_order['order'][0] }}">
                     {% endfor %}

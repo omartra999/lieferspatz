@@ -38,7 +38,7 @@
         </form>
         {% endif %}
         {% if should_show_set_form %}
-        <form action = /set_opening_times class="form-group" method="post">
+        <form action = /restaurant/set_opening_times class="form-group" method="post">
             <div id = day>
                 <div class="form-container">
                 <label for="days">Day: </label>
@@ -63,7 +63,7 @@
             {% endif %}
             {% if show_skip %}
                 <a href = "/add_postal" class = "button-link">skip to delivering Page</a>
-                <a href = "/restaurant_home" class = "button-link">Restaurant Overview</a>
+                <a href = "/restaurant/restaurant_home" class = "button-link">Restaurant Overview</a>
             {% endif %}
         <script>
             let index = 1; // Initialize index variable outside the function

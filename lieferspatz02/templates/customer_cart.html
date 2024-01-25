@@ -2,8 +2,8 @@
 {% block title %}Add to Cart{% endblock %}
 
 {% block button %}
-    <a href="/home" class="button-link">Return to home</a>
-    <form action="{{ url_for('order_cart.customer_history') }}" method="POST">
+    <a href="/customer/home" class="button-link">Return to home</a>
+    <form action="{{ url_for('customer.customer_history') }}" method="POST">
         <input type="hidden" name="user_type" value="customer">
         <input type="submit" value="History" class = "button-link">
     </form>
@@ -38,13 +38,13 @@
         </ul>
 
         <p>Total Price: {{total_price}}</p>
-        <form action="{{url_for('order_cart.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
+        <form action="{{url_for('customer.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
             <input type="hidden" value ="Are you sure you want to submit?" name="pop_out">
             <input type="submit" value="Submit" class="button">
 
             
         </form>
-        <form action="{{url_for('order_cart.clear_cart')}}" method="POST">
+        <form action="{{url_for('clear_cart')}}" method="POST">
             <input type="submit" value="Clear Cart" class="button">
         </form>
     {% else %}
@@ -54,10 +54,11 @@
     <h1> Order Status</h1>
 
         <!-- Filter Form -->
-    <form action="{{ url_for('order_cart.view_cart') }}" method="POST" style="margin-bottom: 10px;">
+    <form action="{{ url_for('customer.view_cart') }}" method="POST" style="margin-bottom: 10px;">
         <label for="order_status">Filter by Status:</label>
         <select name="order_status" id="order_status">
             <option value="All">All</option>
+            <option value="accepted">Accepted</option>
             <option value="open">Open</option>
             <option value="preparing">Preparing</option>
             <option value="delivering">Delivering</option>
