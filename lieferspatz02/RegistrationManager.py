@@ -28,6 +28,8 @@ class registrationManager:
             return False, "Username already exists"
         elif password != passwordConfirm:
             return False, "Passwords do not match" 
+        elif len(plz) != 5:
+            return False, "Enter a Valid plz"
         else:
             with self.connection:
                 self.cursor.execute(customer_query, parameters_customer)
