@@ -19,18 +19,19 @@
         {% endif %}
     {% endwith %}
     
-    <h1 class="welcome">Welcome, {{ restaurantName }}!</h1>
-    <div class="form-group-rh">
-        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="text_rh">
+    <h1>Welcome, {{ restaurantName }}!</h1>
+    <div class="form-group">
+        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
             <label for="logo">Upload Logo:</label>
-            <input type="file" id="choose a logo" class="button-link" name="logo" accept=".jpg, .jpeg, .png" required>
+            <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
             <button type="submit" value="submit" class="button-link">Upload</button>
         </form>
         {% if logo_data %}
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo" class="restaurant_logo">
+            <p>Current Logo:</p>
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo">
         {% else %}
             <p>No logo uploaded yet. Displaying default logo:</p>
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo" class="restaurant_logo">
+            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo">
         {% endif %}
     </div>
 
@@ -72,6 +73,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>Item ID</th>
                     <th>Item Name</th>
                     <th>Description</th>
                     <th>Price</th>
@@ -81,6 +83,7 @@
             <tbody>
                 {% for item in items %}
                 <tr>
+                    <td>{{ item[0] }}</td>
                     <td>{{ item[1] }}</td>
                     <td>{{ item[2] }}</td>
                     <td>{{ item[3] }}</td>
@@ -100,45 +103,44 @@
         {% endif %}
     </div>
         {% if show_menu_form %}
-        <form action="/add_items" method="POST" class="form-group" enctype="multipart/form-data">
-            <label for="item_name">Item Name</label>
-            <input type="text" name="item_name" id="item_name" class="transparent-input"><br><br>
-    
+        <div class="form-group">
+        <form action="/add_items" method="POST" class="form-group">
+            <label for = "item_name" >Item Name</label>
+            <input type="text" name="item_name" id="item_name" class="transparent-input" required><br><br>
             <label for="price">Price</label>
-            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0"><br><br>
-    
+            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0" required><br><br>
             <label for="detail">Details</label><br>
             <textarea id="detail" name="detail" rows="5" cols="25" class="transparent-input"></textarea><br><br>
-    
-            <label for="food_type">Type</label>
-            <select id="food_type" name="food_type" class="transparent-input">
-                <option value="food">Food</option>
-                <option value="drink">Drink</option>
+            <label for = "types">Type</label>
+            <select id="types" name="types" class="transparent-input" required>
+                <option value="Main Dish">Main Dish</option>
+                <option value="Drink">Drink</option>
+                <option value="Appetizer">Appetizer</option>
+                <option value="Dessert">Dessert</option>
+                <option value="Snack">Snacks</option>
+                <option value= "Sandwiche">Sandwiches</option>
+                <option value="Extras">Extras</option>
+                <option value="Special Offers">Special Offers</option>
+                <option value="Finger Food">Finger Food</option>
             </select><br><br>
-    
-            <label for="food_logo">Upload Logo:</label>
-            <input type="file" name="food_logo" accept=".jpg, .jpeg, .png" ><br><br>
-    
-            <button type="submit" value="submit" class="button-link">Add Item</button>
-            <a href="/delete_items" class="button-link">Delete Items from Menu</a>
-            <a href="/restaurant_home" class="button-link">Back to Profile Page</a>
+
+
+            <button type="submit" value="submit" class="button-link">add item</button>
+            <a href = /delete_items class = "button-link">Delete Items from menu</a>
+            <a href="/restaurant_home" class="button-link"> back to profile page </a>
         </form>
         <div id = "updated_menu">
             <h4>Menu after Update</h4>
             <ul>
                 {% for item in addedItems %}
-                <li class="menu-after-update-item">
-                    <span>Item No #{{ loop.index }}:</span><br>
-                    <span>Name: </span>{{ item[1] }}<br>
-                    <span>Price: </span>{{ item[3] }}<span> EUR</span><br>
-                    <span>Details: </span>{{ item[2] }}
-                </li>
+                <li><span>Item Name: </span> {{ item[1] }}</li>
+                <li><span>Item price: </span>{{ item[3] }} </li>
                 {% endfor %}
             </ul>
         </div>
         {% endif %}
     </div>
- <div class="form-group" id="delivery-div">
+    <div class="form-group" id="delivery-div">
 
         <h3>Delivery  Range</h3>
         <table>
@@ -160,8 +162,7 @@
     
 
 
-    </div>
-<div class = "form-group">
+<div class = "form-group" id = "times-div">
     <h3>Opening Times:</h3>
     <div class="form-container">
     <table>
