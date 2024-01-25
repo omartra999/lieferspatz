@@ -563,7 +563,7 @@ def add_items():
             "should_show_edit_form" : False,
             "show_menu_button": False,
             "show_menu_form":True,
-            "addedItems": restaurant.getMenu(),
+            "items": restaurant.getMenu()
             "range":  restaurant.get_delivery_raduis(),
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
