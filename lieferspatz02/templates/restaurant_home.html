@@ -78,16 +78,19 @@
                     <th>Description</th>
                     <th>Price</th>
                     <th>Type</th>
+                    <th>Logo</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in items %}
                 <tr>
-                    <td>{{ item[0] }}</td>
-                    <td>{{ item[1] }}</td>
-                    <td>{{ item[2] }}</td>
-                    <td>{{ item[3] }}</td>
-                    <td>{{ item[4] }}</td>
+    
+                    <td>{{ item.item_id }}</td>
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.item_description }}</td>
+                    <td>{{ item.item_price }}</td>
+                    <td>{{ item.item_type }}</td>
+                    <td><img src="data:image/*;base64,{{ item.item_logo }}"width = 100, height=100 alt="food-logo"></td>
                 </tr>
             {% endfor %}
 
