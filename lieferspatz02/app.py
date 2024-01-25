@@ -297,6 +297,7 @@ def update_profile():
                 session['plz'] = _restaurant_.get_plz()
             else:
                 flash("enter a valid plz")
+                return redirect(url_for('restaurant_home'))
         if new_email:
             _restaurant_.set_email(new_email)
             session['email'] = _restaurant_.get_email()
