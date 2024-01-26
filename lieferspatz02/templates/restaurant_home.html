@@ -9,190 +9,210 @@
 </form>
 {% endblock %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flashes-container">
-                {% for msg in messages %}
-                    <p>{{msg}}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-    
-    <h1>Welcome, {{ restaurantName }}!</h1>
-    <div class="form-group">
-        <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
-            <label for="logo">Upload Logo:</label>
-            <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
-            <button type="submit" value="submit" class="button-link">Upload</button>
-        </form>
-        {% if logo_data %}
-            <p>Current Logo:</p>
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo">
-        {% else %}
-            <p>No logo uploaded yet. Displaying default logo:</p>
-            <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo">
-        {% endif %}
-    </div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flashes-container">
+    {% for msg in messages %}
+    <p>{{msg}}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 
-    <div class = "form-group">
-        <ul>
-            <li>Restaurant Name: <span>{{ restaurantName }}</span></li>
-            <li>Username: <span>{{ userName }}</span></li>
-            <li>Address: <span>{{ restaurantAddress }}</span></li>
-            <li>PLZ: <span>{{ Postal }}</span></li>
-            <li>Email: <span>{{ mail }}</span></li>
-        </ul>
-        <h3>Description:</h3>
-        <p>{{ des }}</p>
-        {% if should_show_edit_button %}
-        <form action="/edit_restaurant_data" method="POST">
-            <button type="submit" value="edit_restaurant_data" class="button-link">Edit Profile</button></form>{% endif %}
-    </div>
-    {% if  should_show_edit_form %}
-        <form action="/update_profile" method = "POST" class="form-group">
-            <label for = "restaurant_name">Restaurant Name:</label>
-            <input type="text" name="restaurant_name" id = "restaurant_name" class="transparent-input"><br><br>
-            <label for = "username">Username: </label>
-            <input type = "text" name="username" id="username" class="transparent-input"><br><br>
-            <label for = "address">Address</label>
-            <input type="text" name="address" id="address" class="transparent-input"> <br><br>
-            <label for = "plz">plz</label>
-            <input type="number" name="plz" id="plz" class="transparent-input"><br><br>
-            <label for = "email">Email</label>
-            <input type="email" name="email" id="email" class="transparent-input"><br><br>
-            <label for = "description">Description</label><br><br>
-            <textarea name="description" id="description" class="transparent-input" rows="5" cols="10"></textarea><br><br>
-            
-            <button type="submit" value="submit" class="button-link">Submit</button>
-
-        </form>
+<h1>Welcome, {{ restaurantName }}!</h1>
+<div class="form-group">
+    <form action="/add_logo" method="POST" enctype="multipart/form-data" class="form-group">
+        <label for="logo">Upload Logo:</label>
+        <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
+        <button type="submit" value="submit" class="button-link">Upload</button>
+    </form>
+    {% if logo_data %}
+    <p>Current Logo:</p>
+    <img src="data:image/*;base64,{{ logo_data }}" alt="Restaurant Logo">
+    {% else %}
+    <p>No logo uploaded yet. Displaying default logo:</p>
+    <img src="data:image/*;base64,{{ logo_data }}" alt="Default Logo">
     {% endif %}
-    <div class = "form-group">
-        <h3>Menu</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Item ID</th>
-                    <th>Item Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Type</th>
-                    <th>Logo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in items %}
-                <tr>
-    
-                    <td>{{ item.item_id }}</td>
-                    <td>{{ item.item_name }}</td>
-                    <td>{{ item.item_description }}</td>
-                    <td>{{ item.item_price }}</td>
-                    <td>{{ item.item_type }}</td>
-                    <td><img src="data:image/*;base64,{{ item.item_logo }}"width = 100, height=100 alt="food-logo"></td>
-                </tr>
-            {% endfor %}
+</div>
 
+<div class="form-group">
+    <ul>
+        <li>Restaurant Name: <span>{{ restaurantName }}</span></li>
+        <li>Username: <span>{{ userName }}</span></li>
+        <li>Address: <span>{{ restaurantAddress }}</span></li>
+        <li>PLZ: <span>{{ Postal }}</span></li>
+        <li>Email: <span>{{ mail }}</span></li>
+    </ul>
+    <h3>Description:</h3>
+    <p>{{ des }}</p>
+    {% if should_show_edit_button %}
+    <form action="/edit_restaurant_data" method="POST">
+        <button type="submit" value="edit_restaurant_data" class="button-link">Edit Profile</button>
+    </form>{% endif %}
+</div>
+{% if should_show_edit_form %}
+<form action="/update_profile" method="POST" class="form-group">
+    <label for="restaurant_name">Restaurant Name:</label>
+    <input type="text" name="restaurant_name" id="restaurant_name" class="transparent-input"><br><br>
+    <label for="username">Username: </label>
+    <input type="text" name="username" id="username" class="transparent-input"><br><br>
+    <label for="address">Address</label>
+    <input type="text" name="address" id="address" class="transparent-input"> <br><br>
+    <label for="plz">plz</label>
+    <input type="number" name="plz" id="plz" class="transparent-input"><br><br>
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" class="transparent-input"><br><br>
+    <label for="description">Description</label><br><br>
+    <textarea name="description" id="description" class="transparent-input" rows="5" cols="10"></textarea><br><br>
 
-            </tbody>
-        </table>
-  
-        {% if show_menu_button %}
-        <form action="/edit_menu" method="POST">
-        <button type = "submit" value = "submit" class="button-link">Edit Menu</button>
-        </form>
-    <br>
-        {% endif %}
-    </div>
-        {% if show_menu_form %}
-        <div class="form-group">
-        <form action="/add_items" method="POST" class="form-group">
-            <label for = "item_name" >Item Name</label>
-            <input type="text" name="item_name" id="item_name" class="transparent-input" required><br><br>
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0" required><br><br>
-            <label for="detail">Details</label><br>
-            <textarea id="detail" name="detail" rows="5" cols="25" class="transparent-input"></textarea><br><br>
-            <label for = "types">Type</label>
-            <select id="types" name="types" class="transparent-input" required>
-                <option value="Main Dish">Main Dish</option>
-                <option value="Drink">Drink</option>
-                <option value="Appetizer">Appetizer</option>
-                <option value="Dessert">Dessert</option>
-                <option value="Snack">Snacks</option>
-                <option value= "Sandwiche">Sandwiches</option>
-                <option value="Extras">Extras</option>
-                <option value="Special Offers">Special Offers</option>
-                <option value="Finger Food">Finger Food</option>
-            </select><br><br>
+    <button type="submit" value="submit" class="button-link">Submit</button>
 
-
-            <button type="submit" value="submit" class="button-link">add item</button>
-            <a href = /delete_items class = "button-link">Delete Items from menu</a>
-            <a href="/restaurant_home" class="button-link"> back to profile page </a>
-        </form>
-        <div id = "updated_menu">
-            <h4>Menu after Update</h4>
-            <ul>
-                {% for item in addedItems %}
-                <li><span>Item Name: </span> {{ item[1] }}</li>
-                <li><span>Item price: </span>{{ item[3] }} </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-    </div>
-    <div class="form-group" id="delivery-div">
-
-        <h3>Delivery  Range</h3>
-        <table>
-            <thead><tr><th>Postal Code</th></tr></thead>
-            {% for _area in range %}
-            <tbody>
-
-                <tr><td>{{ _area[0] }}</td></tr>
-            </tbody>
-
-        </table>
-        {% endfor %}
-
-        <form action="/edit_range" method="POST">
-            <button type="submit" value="submit" class="button-link">edit delivery range</button>
-        </form>
-
-    </div>
-    
-
-
-<div class = "form-group" id = "times-div">
-    <h3>Opening Times:</h3>
-    <div class="form-container">
+</form>
+{% endif %}
+<div class="form-group">
+    <h3>Menu</h3>
     <table>
         <thead>
             <tr>
-                <th>Day</th>
-                <th>Opening Time</th>
-                <th>Closing Time</th>
+                <th>Item ID</th>
+                <th>Item Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Type</th>
+                <th>Logo</th>
+                {% if show_menu_form %}
+                <th>Edit</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
-            {% for time_entry in openTimes %}
+            {% for item in items %}
+            <tr>
+
+                <td>{{ item.item_id }}</td>
+                <td>{{ item.item_name }}</td>
+                <td>{{ item.item_description }}</td>
+                <td>{{ item.item_price }}</td>
+                <td>{{ item.item_type }}</td>
+                <td><img src="data:image/*;base64,{{ item.item_logo }}" width=100, height=100 alt="food-logo"></td>
+                {% if show_menu_form %}
+                <td>
+                    <form action="/add_menu_logo" method="POST" enctype="multipart/form-data" class="form-group">
+                        <label for="logo">Upload Logo:</label>
+                        <input type="text" name="menu_id" value="{{ item.item_id }}" hidden>
+                        <input type="file" name="logo" accept=".jpg, .jpeg, .png" required>
+                        <button type="submit" value="submit" class="button-link">Upload</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+
+    {% if show_menu_button %}
+    <form action="/edit_menu" method="POST">
+        <button type="submit" value="submit" class="button-link">Edit Menu</button>
+    </form>
+    <br>
+    {% endif %}
+</div>
+{% if show_menu_form %}
+<div class="form-group">
+    <form action="/add_items" method="POST" class="form-group">
+        <label for="item_name">Item Name</label>
+        <input type="text" name="item_name" id="item_name" class="transparent-input" required><br><br>
+        <label for="price">Price</label>
+        <input type="number" id="price" name="price" class="transparent-input" step="0.01" min="0" required><br><br>
+        <label for="detail">Details</label><br>
+        <textarea id="detail" name="detail" rows="5" cols="25" class="transparent-input"></textarea><br><br>
+        <label for="types">Type</label>
+        <select id="types" name="types" class="transparent-input" required>
+            <option value="Main Dish">Main Dish</option>
+            <option value="Drink">Drink</option>
+            <option value="Appetizer">Appetizer</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Snack">Snacks</option>
+            <option value="Sandwiche">Sandwiches</option>
+            <option value="Extras">Extras</option>
+            <option value="Special Offers">Special Offers</option>
+            <option value="Finger Food">Finger Food</option>
+        </select><br><br>
+
+
+        <button type="submit" value="submit" class="button-link">add item</button>
+        <a href=/delete_items class="button-link">Delete Items from menu</a>
+        <a href="/restaurant_home" class="button-link"> back to profile page </a>
+    </form>
+    <div id="updated_menu">
+        <h4>Menu after Update</h4>
+        <ul>
+            {% for item in addedItems %}
+            <li><span>Item Name: </span> {{ item[1] }}</li>
+            <li><span>Item price: </span>{{ item[3] }} </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<div class="form-group" id="delivery-div">
+
+    <h3>Delivery Range</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Postal Code</th>
+            </tr>
+        </thead>
+        {% for _area in range %}
+        <tbody>
+
+            <tr>
+                <td>{{ _area[0] }}</td>
+            </tr>
+        </tbody>
+
+    </table>
+    {% endfor %}
+
+    <form action="/edit_range" method="POST">
+        <button type="submit" value="submit" class="button-link">edit delivery range</button>
+    </form>
+
+</div>
+
+
+
+<div class="form-group" id="times-div">
+    <h3>Opening Times:</h3>
+    <div class="form-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Opening Time</th>
+                    <th>Closing Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for time_entry in openTimes %}
                 <tr>
                     <td>{{ time_entry[1] }}</td>
                     <td>{{ time_entry[2] }}</td>
                     <td>{{ time_entry[3] }}</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <form action = "/edit_opening_times" method="POST" class = "form-settings">
-        <button type="submit" value="edit_opening_times" class="button-link">Edit Opening Hours</button>
-    </form>
-    </div>  
+                {% endfor %}
+            </tbody>
+        </table>
+        <form action="/edit_opening_times" method="POST" class="form-settings">
+            <button type="submit" value="edit_opening_times" class="button-link">Edit Opening Hours</button>
+        </form>
     </div>
+</div>
 
 
 
-   
+
 {% endblock %}
