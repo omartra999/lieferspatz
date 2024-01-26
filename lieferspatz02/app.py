@@ -617,7 +617,7 @@ def add_items():
             "should_show_edit_form" : False,
             "show_menu_button": False,
             "show_menu_form":True,
-            "items": items
+            "items": items,
             "range":  restaurant.get_delivery_raduis(),
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
@@ -732,6 +732,37 @@ def add_logo():
             if add:
                 flash("Logo added successfully")
                 updated_logo_data = restaurant.getLogo()
+                print("updated logo: ", updated_logo_data)
+
+                return redirect(url_for("restaurant_home"))
+            else:
+                flash("Error occurred while adding the logo")
+    return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True,range = delivery_range)
+#the new one ****
+@app.route("/add_menu_logo", methods=["POST", "GET"])
+@login_required_restaurant
+def add_menu_logo():
+
+    restaurant_id = session.get('restaurant_id')
+    restaurant = _restaurant(restaurant_id, connection)
+    delivery_range = restaurant.get_delivery_raduis()
+
+    if request.method == "POST":
+        menu_id=request.form.get('menu_id')
+        if 'logo' not in request.files:
+            flash('No file part')
+            return render_template("restaurant_home.html")
+        
+        logo_ = request.files['logo']
+        if logo_.filename == '':
+            flash('No selected file')
+            return render_template("restaurant_home.html")
+
+        if logo_ and allowed_file(logo_.filename):
+            add = restaurant.updated_food_logo(menu_id,logo_)
+            if add:
+                flash("Logo added successfully")
+                updated_logo_data = restaurant.getfoodLogo(menu_id)
                 print("updated logo: ", updated_logo_data)
 
                 return redirect(url_for("restaurant_home"))
