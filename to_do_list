@@ -9,7 +9,12 @@ REGISTER RESTAURANT:
 when added 2nd day into openning time 1st day is missing
 
 *****************
-WHen items are added to menu they dont appear immediately after, add-items page needs to be refreshed first to see final changes 
+NEW BUGS I FOUND
++ WHen items are added to menu they dont appear immediately after, add-items page needs to be refreshed first to see final changes 
+
++ delivery range in /restaurant_home  does not stack postcodes correctly
+
+*********************
 Feature needed:
 In general:
 --
