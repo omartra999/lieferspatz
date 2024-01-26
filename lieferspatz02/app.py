@@ -72,18 +72,13 @@ def register():
         session["confirmPassword"] = confirmPassword
         session["usertype"] = "customer"
 
-        ##comfirming password 
-        if password != confirmPassword:
-            flash("passwords do not match")
-            return render_template("customer_register.html")
-        
-         ##registering
+        ##registering
         if registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz) == True:
             return redirect(url_for('registration_success'))
         else:
             flash(f"error : {registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz)[1]}")
             return render_template("customer_register.html")
-        
+    
     ##linking to "customer_register.html" 
     else:
         return render_template("customer_register.html")
@@ -214,6 +209,7 @@ def restaurant_home():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     if ('restaurant_name') in session and ('restaurant_id') in session:
+
         delivery_range = restaurant.get_delivery_raduis()
         opening_times = time_manager.get_openning_times(restaurant_id)
         logo_data = restaurant.getLogo()
@@ -230,6 +226,8 @@ def restaurant_home():
             }
             items.append(item_dic)
         
+
+       
         # Combine variables into a single dictionary
         template_data = {
             "restaurantName": session['restaurant_name'],
@@ -240,7 +238,7 @@ def restaurant_home():
             "des": session['description'],
             "should_show_edit_button": True,
             "show_menu_button": True,
-            "items": menu,
+            "items": items,
             "range": delivery_range,
             "openTimes": opening_times,
             "logo_data": logo_data
@@ -257,19 +255,6 @@ def edit_restaurant_data():
     time_manager = timeManager(connection)
     restaurant = _restaurant(restaurant_id, connection)
     delivery_range = restaurant.get_delivery_raduis()
-    menu = restaurant.getMenu()
-    items = []
-    for item in menu:
-            item_dic = {
-                "item_id": item[0],
-                "item_name": item[1],
-                "item_description": item[2],
-                "item_price": item[3],
-                "item_type":item[4],
-                "item_logo":restaurant.getfoodLogo(item[0])
-            }
-            items.append(item_dic)
-        
     template_data = {
             "restaurantName": session['restaurant_name'],
             "userName": session['username'],
@@ -280,7 +265,7 @@ def edit_restaurant_data():
             "should_show_edit_button": False,
             "should_show_edit_form" : True,
             "show_menu_button": True,
-            "items": items,
+            "items": restaurant.getMenu(),
             "range": delivery_range,
             "openTimes": time_manager.get_openning_times(restaurant_id),
             "logo_data": restaurant.getLogo()
@@ -470,7 +455,7 @@ def edit_menu():
                 "item_logo":restaurant.getfoodLogo(item[0])
             }
             items.append(item_dic)
-        
+
     template_data = {
             "restaurantName": session['restaurant_name'],
             "userName": session['username'],
@@ -506,6 +491,7 @@ def delete_items():
         return redirect(url_for("restaurant_home"))
 
     items = restaurant.getMenu()  # Fetch menu items for display
+    print("menu: ", items)
     all_menu = []
     for item in items:
         menu = {
@@ -513,7 +499,7 @@ def delete_items():
             "logo":restaurant.getfoodLogo(item[0])
         }
         all_menu.append(menu)
-        print("all_menu",all_menu)
+        
     return render_template("delete_items.html", all_menu= all_menu)
 
 @app.route("/delete_area", methods = ["POST", "GET"])
@@ -600,11 +586,14 @@ def add_items():
                 "item_type":item[4],
                 "item_logo":restaurant.getfoodLogo(item[0])
             }
-            items.append(item_dic)        
+            items.append(item_dic)
+
+
+        
+        
         
         
         if restaurant.add_item(item_name, detail, price, types, logo):
-            items = restaurant.getMenu()
             flash("item added successfuly")
             template_data = {
             "restaurantName": session['restaurant_name'],
@@ -617,10 +606,11 @@ def add_items():
             "should_show_edit_form" : False,
             "show_menu_button": False,
             "show_menu_form":True,
-            "items": items,
             "range":  restaurant.get_delivery_raduis(),
             "openTimes": time_manager.get_openning_times(restaurant_id),
-            "logo_data": restaurant.getLogo()
+            "logo_data": restaurant.getLogo(),
+            "items" : items,
+            "item_logo": logo
         }
             return render_template("restaurant_home.html", **template_data)
         else:
@@ -629,7 +619,6 @@ def add_items():
     else:
         return render_template("restaurant_home.html", show_menu_button = False, show_menu_form = True)
 
-    
 @app.route("/home", methods=["GET", "POST"])
 @login_required_customer
 def home():
@@ -697,6 +686,7 @@ def restaurant_menu():
         # Fetch restaurant information based on the provided restaurant_id
     else:
         return redirect(url_for('home'))
+ 
 @app.route("/delivery_timer")
 def delivery_timer():
         return render_template("delivery_timer.html")
@@ -738,7 +728,7 @@ def add_logo():
             else:
                 flash("Error occurred while adding the logo")
     return render_template("restaurant_home.html", show_menu_button=False, show_menu_form=True,range = delivery_range)
-#the new one ****
+
 @app.route("/add_menu_logo", methods=["POST", "GET"])
 @login_required_restaurant
 def add_menu_logo():
@@ -752,7 +742,7 @@ def add_menu_logo():
         if 'logo' not in request.files:
             flash('No file part')
             return render_template("restaurant_home.html")
-        
+
         logo_ = request.files['logo']
         if logo_.filename == '':
             flash('No selected file')
