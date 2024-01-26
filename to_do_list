@@ -8,7 +8,8 @@ EDIT_RANGE SEEMS MISSING:
 REGISTER RESTAURANT:
 when added 2nd day into openning time 1st day is missing
 
-
+*****************
+WHen items are added to menu they dont appear immediately after, add-items page needs to be refreshed first to see final changes 
 Feature needed:
 In general:
 --
