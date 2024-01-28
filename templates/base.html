@@ -1,0 +1,38 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(function () {
+                    var flashesContainer = document.querySelector('.flashes-container');
+                    if (flashesContainer) {
+                        flashesContainer.style.display = 'none';
+                    }
+                }, 10000); // 10 seconds (10000 milliseconds)
+            });
+            function confirmSubmission() {
+            var pop_up = document.getElementsByName('pop_out')[0].value;
+            var confirmation = confirm(pop_up);
+            return confirmation;
+            }
+        </script>
+        
+    </head>
+    <body>
+        <!--top navigation bar-->
+        <div class="topnav">
+            <div class="logo-group">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+                <h1 class="lieferspatz-text">LIEFERSPATZ</h1>
+            </div>
+            <div class="button-container">
+                {% block button %} {% endblock %}
+            </div>
+        </div>
+        {% block content %}
+        {% endblock %}
+        
+    </body>
+</html>

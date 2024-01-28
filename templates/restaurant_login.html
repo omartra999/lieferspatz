@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block button %}<a href = "/login" class = "button-link">Login</a>
+<a href="/register" class="button-link">Register</a>
+<a href="/restaurant_register" class="button-link">Register a Buisness</a> {% endblock %}
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flashes-container"> 
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+    <div class="form-containerCL">
+
+        <form action= # method="POST" class="form-group">
+
+            <p class="box-name">RESTAURANT LOGIN</p>
+
+            <label for = "username">Username</label>
+            <input type="text" class="transparent-input" name="username" id="username" required><br><br>
+
+            <label for = "password">Password</label>
+            <input type="password" class="transparent-input" name="password" id="password" required><br><br>
+            <input type="submit" value="LOGIN" class="register-button">
+        </form>
+        </div>
+{% endblock %}

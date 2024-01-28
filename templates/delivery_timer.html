@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Food Delivery Status</h2>
+
+    <div id="countdown"></div>
+
+    <div id="deliveryMessage" style="display: none;">Food has been delivered!</div>
+
+    <script>
+        // Set the starting number for the countdown
+        var countdownNumber = 10;
+
+        // Function to update the countdown
+        function updateCountdown() {
+            document.getElementById('countdown').innerHTML = countdownNumber;
+            countdownNumber--;
+
+            // When countdown reaches zero, display the delivery message
+            if (countdownNumber < 0) {
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('deliveryMessage').style.display = 'block';
+            } else {
+                setTimeout(updateCountdown, 1000); // Update every second
+            }
+        }
+
+        // Start the countdown when the page loads
+        window.onload = function () {
+            updateCountdown();
+        };
+    </script>
+{% endblock %}
