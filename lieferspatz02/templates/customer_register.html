@@ -4,17 +4,17 @@
 <a href="/restaurant_register" class="button-link">Create a business account</a>
 <a href="/login" class="button-link">Customer Login</a>
 {% endblock %}
+
     {% block content %}
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flashes-container"> 
-                {% for msg in messages %}
-                    <p>{{ msg }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
+{% if messages %}
+    <div class="flashes-container">
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
         <div class="form-container">
                    
             <form action = "#" method = "POST" class="form-group">
@@ -34,7 +34,7 @@
                 <input type="number" class="transparent-input" id="houseNr" name="houseNr" required><br><br>
 
                 <label for="plz">Postal Code:</label>
-                <input type="number" class="transparent-input" id="plz" name="plz" required><br><br>
+                <input type="number" class="transparent-input" id="plz" min="10000" max="99999" name="plz" required><br><br>
 
                 <label for="username">Username: </label>
                 <input type="text" class="transparent-input" id="username" name="username" required><br><br>
