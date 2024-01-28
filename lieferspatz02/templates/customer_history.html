@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Add to Cart{% endblock %}
+{% block title %}Your History{% endblock %}
 {% block button %}
     <a href="/home" class="button-link">Home</a>
     <form action="/logout_customer" method="POST">
@@ -11,27 +11,28 @@
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
-                <p>{{msg}}</p>
+                <p>{{ msg }}</p>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
     {% if all_history %}
         <ul>
-            {% for history in all_history %}
-                <li>
-                    {{ history.menu[2] }} - Restaurant: {{ history.restaurant[2] }} - Customer: {{ history.customer[1] }} - Status: {{ history.history[7] }}
-                    <!-- Add more details as needed -->
-                </li>
+            {% for historytime, history in all_history.items() %}
+                <h3>Order at {{ historytime[0] }}, {{ historytime[1] }} </h3>
+                {% for current_order in history %}
+                    <li>
+                        {{ current_order.menu[2] }} - Restaurant: {{ current_order.restaurant[2] }} - Customer: {{ current_order.customer[1] }} - Status: {{ current_order.history[7] }}
+                        <!-- Add more details as needed -->
+                    </li>
+                {% endfor %}
             {% endfor %}
-            <form action="{{url_for('order_cart.clear_history')}}" method="POST">
-                <input type = "hidden" value = "customer" name = "user_type">
+            <form action="{{ url_for('order_cart.clear_history') }}" method="POST">
+                <input type="hidden" value="customer" name="user_type">
                 <input type="submit" value="Delete history" class="button">
             </form>
         </ul>
     {% else %}
         <p>History is empty</p>
     {% endif %}
-
-
 {% endblock %}
