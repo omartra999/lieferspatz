@@ -71,9 +71,9 @@ def register():
         session["password"] = password
         session["confirmPassword"] = confirmPassword
         session["usertype"] = "customer"
-
+        
         ##registering
-        if registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz) == True:
+        if registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz) :
             return redirect(url_for('registration_success'))
         else:
             flash(f"error : {registerManager.registerCustomer(firstname,lastname,email,username,password,confirmPassword,street,houseNr,plz)[1]}")
