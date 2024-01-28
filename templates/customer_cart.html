@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Add to Cart{% endblock %}
+
+{% block button %}
+    <a href="/customer/home" class="button-link">Return to home</a>
+    <form action="{{ url_for('customer.customer_history') }}" method="POST">
+        <input type="hidden" name="user_type" value="customer">
+        <input type="submit" value="History" class = "button-link">
+    </form>
+    
+    <form action="/logout_customer" method="POST">
+        <input type="submit" value="Logout" class="button-link">
+    </form>
+{% endblock %}
+
+{% block content %}
+    <h1>Your Cart</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    {{ item.item_name }} - Price: {{ item.price }} - Quantity:{{ item.quantity}}
+                
+                    <!-- Add a text input for order-specific description -->
+                <label for="order_description_{{ loop.index }}" style=" margin-top: 10px;" > <br> Order Description: </label>
+                <input type="text" name="order_description_{{ loop.index }}" id="order_description_{{ loop.index }}" placeholder="Enter order description">
+                    
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p>Total Price: {{total_price}}</p>
+        <form action="{{url_for('customer.submit_order')}}" method="POST" onsubmit="return confirmSubmission()">
+            <input type="hidden" value ="Are you sure you want to submit?" name="pop_out">
+            <input type="submit" value="Submit" class="button">
+
+            
+        </form>
+        <form action="{{url_for('clear_cart')}}" method="POST">
+            <input type="submit" value="Clear Cart" class="button">
+        </form>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+
+    <h1> Order Status</h1>
+
+        <!-- Filter Form -->
+    <form action="{{ url_for('customer.view_cart') }}" method="POST" style="margin-bottom: 10px;">
+        <label for="order_status">Filter by Status:</label>
+        <select name="order_status" id="order_status">
+            <option value="All">All</option>
+            <option value="accepted">Accepted</option>
+            <option value="open">Open</option>
+            <option value="preparing">Preparing</option>
+            <option value="delivering">Delivering</option>
+            <!-- Add more status options as needed -->
+        </select>
+        <input type="submit" value="Filter" class="button">
+    </form>
+    {% if all_order %}
+        <ul>
+            {% for current_order in all_order %}
+                <li>
+                    {{ current_order.menu[2] }} - Restaurant: {{ current_order.restaurant[2] }} - Price: {{ current_order.menu[4] }} EUR - Status: {{current_order.order[7]}}
+                    <!-- Add more details as needed -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have no orders.</p>
+    {% endif %}
+{% endblock %}

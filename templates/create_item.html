@@ -1,0 +1,38 @@
+<!--##columns are in order: id[0], first_name[1], last_name[2],street[3],houseNr[4]
+        ##plz[5], email[6], username[7], password[9]-->
+        {% extends "base.html" %}
+        {% block title %}Registration Form{% endblock %}
+        {% block content %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flashes-container">
+                        {% for msg in messages %}
+                            <p>{{msg}}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+                <div class="form-container">
+                           
+                    <form action = "#" method = "POST" class="form-group">
+                        <!--register from-->
+                        <p class="join-us-text">JOIN US</p>
+        
+                        <label for = "item_name">Name: </label>
+                        <input type="text" class="transparent-input" id="item_name" name="item_name" required><br><br>
+                        
+                        <label for = "detail">detail: </label>
+                        <input type="text" class="transparent-input" id="detail" name="detail" required><br><br>
+        
+                        <label for = "price">price: </label>
+                        <input type="text" class="transparent-input" id="price" name="price" required><br><br>
+                        
+                        <input type="submit" value="REGISTER" class="register-button">
+                    </form>
+                    
+                    <img src="{{ url_for('static', filename='images/customer_registration.jpg') }}" alt="Customer Registration Image" class="registration-image">
+                </div>
+        
+                
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styling.css') }}">
+            {% endblock %}
