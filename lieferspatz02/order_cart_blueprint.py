@@ -69,7 +69,7 @@ def update_status():#edit order status
 
 @order_cart.route('/your_history', methods=['GET', 'POST'])
 def customer_history():#show customer history
-    print(session)
+    #print(session)
     conn = sqlite3.connect(connection)
     cursor = conn.cursor()
 
@@ -80,17 +80,21 @@ def customer_history():#show customer history
         print(user_type)
         query = "SELECT * FROM Orders WHERE customer_id = ? AND Status = 'delivering' "
         history = cursor.execute(query, (id,)).fetchall()
-        all_history = []
+        all_history = {}
         print(history)
         if history:
             for p in history:
+                time = (p[5],p[6])
+                print(time)
+                if time not in all_history:
+                    all_history[time] = []
                 template_data = {
                     "menu": f.get_information(p[1], 'menu'),
                     "restaurant": f.get_information(p[2], 'restaurant'),
                     "customer": f.get_information(p[3], 'customer'),
                     "history": p
                 }
-                all_history.append(template_data)
+                all_history[time].append(template_data)
         print(all_history)
         return render_template("customer_history.html", all_history=all_history)
     else:
