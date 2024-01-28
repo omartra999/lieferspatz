@@ -109,10 +109,13 @@ def restaurant_history():#show restaurant history
     # show history 
     if request.method == 'GET':
         history = restaurant.get_order_history()
-        all_history = []
+        all_history = {}
         #same format as below
         if history:
             for p in history:
+                customer_name = f.get_information(p[3], 'customer')[7]
+                if customer_name not in all_history:
+                    all_history[customer_name] = []
                 template_data = {
                     "menu": f.get_information(p[1], 'menu'),
                     "restaurant": f.get_information(p[2], 'restaurant'),
@@ -120,12 +123,11 @@ def restaurant_history():#show restaurant history
                     "status": p[7],
                     "history": p
                 }
-                all_history.append(template_data)
+                all_history[customer_name].append(template_data)
         print(all_history)
         return render_template("restaurant_history.html", all_history=all_history)
     else:
         return "No user type provided or invalid request."
-
 
 @order_cart.route('/clear_history', methods = ['POST', 'GET'])
 def clear_history():#clear history **testing for global
